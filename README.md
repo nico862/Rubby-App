@@ -20,9 +20,8 @@ Run:
 
 # App
 
-Install react native and deps
+Install deps
 
-    npm i -g react-native
     npm i
 
 Build code:
@@ -31,4 +30,4 @@ Build code:
 
 Run in simulator:
 
-    react-native run-ios --simulator="iPhone 5"
+    npm run -- react-native run-ios --simulator="iPhone 5"
