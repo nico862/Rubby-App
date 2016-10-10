@@ -32,7 +32,7 @@ Install deps
 
 Build code:
 
-    npm run gulp-watch
+    npm run gulp watch
 
 Run in simulator:
 
