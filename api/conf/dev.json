@@ -1,0 +1,30 @@
+{
+  "env": "dev",
+  "express": {
+    "port": 8080
+  },
+  "dynamoDB": {
+    "endpoint": "http://localhost:8010"
+  },
+  "database": {
+    "ruuby":  {
+      "host":     "192.168.56.104",
+      "database": "ruuby",
+      "user":     "ruuby",
+      "password": "ruuby"
+    }
+  },
+  "bookingsApi": {
+    "endpoint": "http://localhost:8000"
+  },
+  "log": {
+    "level": "debug"
+  },
+  "jwt": {
+    "tokenSecret": "foo",
+    "expires": "P2D"
+  },
+  "calendar": {
+    "daysAhead": 31
+  }
+}

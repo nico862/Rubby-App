@@ -1,0 +1,3 @@
+export const FETCH_CALENDAR_ATTEMPT = "RuubyPA.calendar.FETCH_CALENDAR_ATTEMPT";
+export const FETCH_CALENDAR_SUCCESS = "RuubyPA.calendar.FETCH_CALENDAR_SUCCESS";
+export const FETCH_CALENDAR_FAIL = "RuubyPA.calendar.FETCH_CALENDAR_FAIL";

@@ -21,7 +21,7 @@ interface ChatScreenState {
 }
 
 export default class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
-  constructor(props) {
+  constructor(props: ChatScreenProps) {
     super(props);
     this.state = {messages: []};
     this.onSend = this.onSend.bind(this);
@@ -44,7 +44,7 @@ export default class ChatScreen extends React.Component<ChatScreenProps, ChatScr
     });
   }
 
-  onSend(messages = []) {
+  onSend(messages: any[] = []) {
     this.setState((previousState) => {
       return {
         messages: GiftedChat.append(previousState.messages, messages),
@@ -52,7 +52,7 @@ export default class ChatScreen extends React.Component<ChatScreenProps, ChatScr
     });
   }
 
-  renderBubble(props) {
+  renderBubble(props: any) {
     return (
       <Bubble
         {...props}

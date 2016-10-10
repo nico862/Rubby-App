@@ -1,4 +1,10 @@
+import * as bookingsActions from "../reducers/bookings/actions";
+import * as sessionActions from "../reducers/session/actions";
+
+import Spinner from "react-native-loading-spinner-overlay";
 import * as React from "react";
+import {connect} from "react-redux";
+import { SegmentedControls } from "react-native-radio-buttons";
 import {
   Text,
   View,
@@ -8,7 +14,7 @@ import {
   ListView,
   ListViewDataSource,
 } from "react-native";
-import { SegmentedControls } from "react-native-radio-buttons";
+
 const moment = require("moment");
 
 interface BookingsScreenProps {
@@ -17,114 +23,95 @@ interface BookingsScreenProps {
 
 interface BookingsScreenState {
   selectedIndex?: number;
-  dataSource?: ListViewDataSource;
+  completedBookings?: ListViewDataSource;
+  upcomingBookings?: ListViewDataSource;
+  session: any;
+  visible: boolean;
 }
 
-const bookings = [
-  {
-    id: 1,
-    time: "2016-10-01T13:00:00+01",
-    durationMinutes: 60,
-    treatmentName: "Massage",
-    customerName: "Pete Smith",
-    address: {
-      address1: "11 Edith Grove",
-      town: "London",
-      postcode: "SW10 0JZ"
-    }
-  },
-  {
-    id: 2,
-    time: "2016-10-01T16:00:00+01",
-    durationMinutes: 60,
-    treatmentName: "Massage",
-    customerName: "Pete Smith",
-    address: {
-      address1: "11 Edith Grove",
-      town: "London",
-      postcode: "SW10 0JZ"
-    }
-  },
-  {
-    id: 3,
-    time: "2016-10-02T09:00:00+01",
-    durationMinutes: 60,
-    treatmentName: "Massage",
-    customerName: "Pete Smith",
-    address: {
-      address1: "11 Edith Grove",
-      town: "London",
-      postcode: "SW10 0JZ"
-    }
-  },
-  {
-    id: 4,
-    time: "2016-10-02T10:30:00+01",
-    durationMinutes: 60,
-    treatmentName: "Massage",
-    customerName: "Pete Smith",
-    address: {
-      address1: "11 Edith Grove",
-      town: "London",
-      postcode: "SW10 0JZ"
-    }
-  },
-  {
-    id: 5,
-    time: "2016-10-03T16:00:00+01",
-    durationMinutes: 60,
-    treatmentName: "Massage",
-    customerName: "Pete Smith",
-    address: {
-      address1: "11 Edith Grove",
-      town: "London",
-      postcode: "SW10 0JZ"
-    }
-  },
-  {
-    id: 6,
-    time: "2016-10-07T09:40:00+01",
-    durationMinutes: 60,
-    treatmentName: "Massage",
-    customerName: "Pete Smith",
-    address: {
-      address1: "11 Edith Grove",
-      town: "London",
-      postcode: "SW10 0JZ"
-    }
-  },
-];
-
-export default class BookingsScreen extends React.Component<BookingsScreenProps, BookingsScreenState> {
+class BookingsScreen extends React.Component<any, any> {
   static navigatorStyle = {
     navBarBackgroundColor: "#fbece9",
     navBarButtonColor: "black"
   };
 
-  constructor() {
-    super();
+  static navigatorButtons = {
+    rightButtons: [
+      {
+        icon: require("../../resources/images/buttons/profile.png"),
+        id: "user"
+      }
+    ]
+  };
 
-    const dataSource = new ListView.DataSource(
-      {rowHasChanged: (r1, r2) => r1.id !== r2.id}
-    );
+  constructor(props: any) {
+    super(props);
+
+    let completedBookings = new ListView.DataSource({
+      rowHasChanged: this._rowHasChanged,
+    });
+
+    let upcomingBookings = new ListView.DataSource({
+      rowHasChanged: this._rowHasChanged,
+    });
 
     this.state = {
       selectedIndex: 1,
-      dataSource: dataSource.cloneWithRows(bookings)
+      completedBookings,
+      upcomingBookings,
+      bookingsAreLoading: false
     };
+
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
   }
 
-  setSelectedOption(selectedSegment, selectedIndex) {
+  onNavigatorEvent(event: any) {
+    if (event.type === "NavBarButtonPress") {
+      if (event.id === "user") {
+        this.props.dispatch(sessionActions.logout());
+      }
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.session.isAuthenticated) {
+      this.props.dispatch(bookingsActions.fetchBookings());
+    }
+  }
+
+  componentWillReceiveProps(nextProps: any) {
+    if (nextProps.bookings.bookings !== this.props.bookings.bookings) {
+      this.setState({
+        completedBookings: this.state.completedBookings.cloneWithRows(nextProps.bookings.bookings.completed),
+        upcomingBookings: this.state.completedBookings.cloneWithRows(nextProps.bookings.bookings.upcoming)
+      });
+    }
+
+    this.setState({bookingsAreLoading: nextProps.bookings.loading});
+  }
+
+  setSelectedOption(selectedSegment: string, selectedIndex: number) {
     this.setState({
       selectedIndex
     });
   }
 
-  renderRow(rowData, sectionID, rowID) {
-    const dateTime = moment(rowData.time).format("ddd D MMM HH:mm");
+  _rowHasChanged(oldRow: any, newRow: any) {
+    return oldRow !== newRow;
+  }
+
+  renderRow(booking: any, sectionID: string, rowID: string) {
+    const dateTime = moment(booking.timeStarts).format("ddd D MMM HH:mm");
+
+    const treatments = booking.bookingTreatments.map((bookingTreatment: any) => {
+      return (
+        <Text style={styles.treatment} key={bookingTreatment["@id"]}
+          numberOfLines={1}>{bookingTreatment.treatment.name} - {bookingTreatment.treatment.durationMinutes} mins</Text>
+      );
+    });
 
     return (
-      <TouchableHighlight onPress={() => this.onBookingPress(rowData.id)}
+      <TouchableHighlight onPress={() => this.onBookingPress(booking.id)}
         underlayColor="#dddddd">
         <View>
           <View style={styles.rowContainer}>
@@ -132,12 +119,11 @@ export default class BookingsScreen extends React.Component<BookingsScreenProps,
               <Text style={styles.time}
                     numberOfLines={1}>{dateTime}</Text>
 
-              <Text style={styles.treatment}
-                    numberOfLines={1}>{rowData.treatmentName} - {rowData.durationMinutes} mins</Text>
-
               <Text style={styles.customer} numberOfLines={1}>
-                {rowData.customerName} - {rowData.address.postcode}
+                {booking.customer.firstName} {booking.customer.lastName} - {booking.address.postcode}
               </Text>
+
+              {treatments}
             </View>
           </View>
           <View style={styles.separator}/>
@@ -153,13 +139,54 @@ export default class BookingsScreen extends React.Component<BookingsScreenProps,
     });
   }
 
+  renderUpcoming() {
+    if ((this.state.selectedIndex === 0) || this.state.bookingsAreLoading) {
+      return null;
+    }
+    else if (this.state.upcomingBookings.getRowCount()) {
+      return (
+        <ListView
+          dataSource={this.state.upcomingBookings}
+          renderRow={this.renderRow.bind(this)}
+          enableEmptySections={true} />
+      );
+    }
+    else {
+      return (
+        <View style={styles.noBookingsView}>
+          <Text style={styles.noBookings}>You have no upcoming bookings</Text>
+        </View>
+      );
+    }
+  }
+
+  renderCompleted() {
+    if ((this.state.selectedIndex === 1) || this.state.bookingsAreLoading) {
+      return null;
+    }
+    else if (this.state.completedBookings.getRowCount()) {
+      return (
+        <ListView
+          dataSource={this.state.completedBookings}
+          renderRow={this.renderRow.bind(this)}
+          enableEmptySections={true} />
+      );
+    }
+    else {
+      return (
+        <View style={styles.noBookingsView}>
+          <Text style={styles.noBookings}>You have no upcoming bookings</Text>
+        </View>
+      );
+    }
+  }
+
   render() {
-    const options = ["Completed", "Upcoming"];
     return (
         <View style={styles.container}>
           <View style={styles.segmentedButtons}>
             <SegmentedControls
-              options={ options }
+              options={ ["Completed", "Upcoming"] }
               onSelection={ this.setSelectedOption.bind(this) }
               selectedIndex={ this.state.selectedIndex }
               tint={"black"}
@@ -167,9 +194,11 @@ export default class BookingsScreen extends React.Component<BookingsScreenProps,
               containerBorderTint={"black"}
             />
           </View>
-          <ListView
-            dataSource={this.state.dataSource}
-            renderRow={this.renderRow.bind(this)}/>
+
+          <Spinner visible={this.state.bookingsAreLoading} />
+
+          { this.renderCompleted() }
+          { this.renderUpcoming() }
         </View>
     );
   }
@@ -208,5 +237,22 @@ const styles = StyleSheet.create({
   } as TextStyle,
   segmentedButtons: {
     margin: 10
-  }
+  },
+  noBookingsView: {
+    marginTop: 20,
+  },
+  noBookings: {
+    textAlign: "center",
+    color: "#666666"
+  } as TextStyle,
 });
+
+// which props do we want to inject, given the global state?
+function mapStateToProps(state: any) {
+  return {
+    session: state.session,
+    bookings: state.bookings,
+  };
+}
+
+export default connect(mapStateToProps)(BookingsScreen);

@@ -1,30 +1,88 @@
-import {Navigation} from "react-native-navigation";
+import {createStore, applyMiddleware, combineReducers} from "redux";
+import {Provider} from "react-redux";
+import {Navigation, NavigatorButtonsConfig} from "react-native-navigation";
+import thunk from "redux-thunk";
 
-// screen related book keeping
+import reducers from "./reducers/index";
+import * as sessionActions from "./reducers/session/actions";
 import {registerScreens} from "./screens/index.ios";
-registerScreens();
 
-// this will start our app
-Navigation.startTabBasedApp({
-  tabs: [
-    {
-      label: "Bookings",
-      screen: "RuubyPa.BookingsScreen",
-      icon: require("../img/one.png"),
-      selectedIcon: require("../img/one_selected.png"),
-      title: "Bookings"
-    },
-    {
-      label: "Availability",
-      screen: "RuubyPa.AvailabilityScreen",
-      icon: require("../img/two.png"),
-      selectedIcon: require("../img/two_selected.png"),
-      title: "Availability"
-    }
-  ],
-  tabsStyle: {
-    tabBarButtonColor: "rgb(200, 200, 200)",
-    tabBarBackgroundColor: "black",
-    tabBarSelectedButtonColor: "white"
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+const reducer = combineReducers(reducers);
+const store = createStoreWithMiddleware(reducer);
+
+registerScreens(store, Provider);
+
+class App {
+  currentRootLayout: string;
+
+  constructor() {
+    // since react-redux only works on components, we need to subscribe this class manually
+    store.subscribe(this.onStoreUpdate.bind(this));
+    store.dispatch(sessionActions.appInitialized());
   }
-});
+
+  onStoreUpdate() {
+    const newRootLayout = store.getState().session.rootLayout;
+
+    if (this.currentRootLayout !== newRootLayout) {
+      this.currentRootLayout = newRootLayout;
+      this.startApp(newRootLayout);
+    }
+  }
+
+  startApp(layout: string) {
+    switch (layout) {
+      case "wait":
+        console.log("Waiting for app to start up");
+
+      case "login":
+        Navigation.startSingleScreenApp({
+          screen: {
+            screen: "RuubyPA.LoginScreen",
+            title: "Login",
+            navigatorStyle: {}
+          },
+        });
+
+        return;
+
+      case "main":
+        Navigation.startTabBasedApp({
+          tabs: [
+            {
+              screen: "RuubyPA.BookingsScreen",
+              icon: require("../resources/images/buttons/bookings.png"),
+              selectedIcon: require("../resources/images/buttons/bookings.png"),
+              title: "Bookings tab",
+              overrideBackPress: true,
+            },
+            {
+              screen: "RuubyPA.CalendarScreen",
+              icon: require("../resources/images/buttons/calendar.png"),
+              selectedIcon: require("../resources/images/buttons/calendar.png"),
+              title: "Availability",
+            }
+          ],
+          tabsStyle: {
+            tabBarBackgroundColor: "black",
+            tabBarButtonColor: "#666666",
+            tabBarSelectedButtonColor: "white"
+          },
+          animationType: "slide-down",
+          title: "Ruuby PA",
+          appStyle: {
+            bottomTabBadgeTextColor: "#ffffff",
+            bottomTabBadgeBackgroundColor: "#ff0000",
+          }
+        });
+
+        return;
+
+      default:
+        console.error("Unknown app root");
+    }
+  }
+}
+
+const app = new App();
