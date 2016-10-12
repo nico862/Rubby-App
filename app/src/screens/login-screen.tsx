@@ -6,10 +6,13 @@ import {
   View,
   StyleSheet,
   TextStyle,
+  ViewStyle,
+  ImageStyle,
   Image,
   TouchableOpacity,
   StatusBar,
-  NativeSyntheticEvent
+  NativeSyntheticEvent,
+  Animated,
 } from "react-native";
 import {connect} from "react-redux";
 
@@ -18,6 +21,8 @@ import * as sessionActions from "../reducers/session/actions";
 interface LoginScreenState {
   username?: string;
   password?: string;
+  error?: string;
+  errorBoxBounceValue?: Animated.Value;
 }
 
 class LoginScreen extends React.Component<any, LoginScreenState> {
@@ -31,11 +36,33 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
     this.state = {
       username: "",
       password: "",
+      error: null,
     };
   }
 
   componentWillUnmount() {
     console.log("Component-Lifecycle", "componentWillUnmount", "LoginScreen");
+  }
+
+  componentWillReceiveProps(nextProps: any) {
+    if (nextProps.session.error !== this.props.session.error) {
+      const errorBoxBounceValue = new Animated.Value(30);
+
+      Animated.spring(
+        errorBoxBounceValue,
+        {
+          toValue: 0,
+          velocity: 3,
+          tension: 2,
+          friction: 8,
+        }
+      ).start();
+
+      this.setState({
+        errorBoxBounceValue,
+        error: nextProps.session.error
+      });
+    }
   }
 
   onUsernameTextChanged(event: any) {
@@ -47,12 +74,32 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
   }
 
   onLoginPress() {
-    this.props.dispatch(
-      sessionActions.login(this.state.username, this.state.password)
-    );
+    if (this.state.username && this.state.password) {
+      this.props.dispatch(
+        sessionActions.login(this.state.username, this.state.password)
+      );
+    }
+  }
+
+  errorField() {
+    if (this.state.error) {
+      const errorStyle = {
+        transform: [{translateY: this.state.errorBoxBounceValue}]
+      };
+
+      return (
+        <Animated.View style={[styles.error, errorStyle]}>
+          <Text style={styles.errorText}>{this.state.error}</Text>
+        </Animated.View>
+      );
+    }
+
+    return null;
   }
 
   render() {
+    const error = this.errorField();
+
     return (
           <View style={styles.container}>
              <StatusBar
@@ -94,11 +141,16 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
                     <Text style={styles.greyFont}>Forgot Password</Text>
                 </View>
             </View>
-            <TouchableOpacity
-              style={styles.signin}
-              onPress={ this.onLoginPress.bind(this) }>
-                <Text style={styles.pinkFont}>Sign In</Text>
-            </TouchableOpacity>
+            <View style={styles.signinButtonContainer}>
+              <View style={styles.errorContainer}>
+                {error}
+              </View>
+              <TouchableOpacity
+                style={styles.signin}
+                onPress={ this.onLoginPress.bind(this) }>
+                  <Text style={styles.pinkFont}>Sign In</Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.footer}>
             </View>
         </View>
@@ -119,15 +171,15 @@ const styles = StyleSheet.create({
         top: 0,
         width: windowSize.width,
         height: windowSize.height
-    } as TextStyle,
-    bgTint: {
-        position: "absolute",
-        left: 0,
-        top: 0,
-        width: windowSize.width,
-        height: windowSize.height,
-        backgroundColor: "rgba(116, 109, 108, 0.55)"
-    } as TextStyle,
+    } as ImageStyle,
+    // bgTint: {
+    //     position: "absolute",
+    //     left: 0,
+    //     top: 0,
+    //     width: windowSize.width,
+    //     height: windowSize.height,
+    //     backgroundColor: "rgba(116, 109, 108, 0.55)"
+    // } as TextStyle,
     header: {
         justifyContent: "center",
         alignItems: "center",
@@ -141,17 +193,17 @@ const styles = StyleSheet.create({
     },
     signin: {
         backgroundColor: "black",
-        padding: 20,
-        alignItems: "center"
+        alignItems: "center",
+        justifyContent: "center",
+        height: 55,
     } as TextStyle,
     footer: {
       flex: .15
     } as TextStyle,
     inputs: {
         marginTop: 10,
-        marginBottom: 10,
-        flex: .25
-    },
+        flex: .25,
+    } as ViewStyle,
     inputContainer: {
         padding: 10,
         borderWidth: 1,
@@ -179,13 +231,36 @@ const styles = StyleSheet.create({
     },
     pinkFont: {
       color: "#fbece9"
-    }
+    },
+    signinButtonContainer: {
+      height: 85,
+      // flexShrink: 0,
+    } as ViewStyle,
+    errorContainer: {
+      position: "relative",
+      overflow: "hidden",
+      height: 30,
+    } as ViewStyle,
+    error: {
+      left: 0,
+      right: 0,
+      padding: 5,
+      height: 30,
+      backgroundColor: "red",
+      position: "absolute",
+      alignItems: "center",
+      justifyContent: "center",
+    } as ViewStyle,
+    errorText: {
+      color: "white",
+      fontSize: 12,
+    } as TextStyle
 });
 
 // which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {
   return {
-    counter: state.counter
+    session: state.session
   };
 }
 

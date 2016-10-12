@@ -136,23 +136,25 @@ class CalendarScreen extends React.Component<any, any> {
         }
       }
 
-      const circle = (
-        <View style={circleStyle} key={day.date}>
-          <Text style={circleTextStyle}>{day.day}</Text>
-        </View>
-      );
-
       if (clickable) {
         return (
-          <TouchableHighlight onPress={() => this.onDayPress(day.date)}
-            underlayColor="#dddddd"
-            key={day.date}>
-            {circle}
-          </TouchableHighlight>
+          <View style={circleStyle} key={day.date}>
+            <TouchableHighlight onPress={() => this.onDayPress(day.date)}
+              underlayColor="#dddddd"
+              style={styles.button}
+              key={day.date}>
+              <Text style={circleTextStyle}>{day.day}</Text>
+            </TouchableHighlight>
+          </View>
         );
       }
-
-      return circle;
+      else {
+        return (
+          <View style={circleStyle} key={day.date}>
+            <Text style={circleTextStyle}>{day.day}</Text>
+          </View>
+        );
+      }
     });
 
     const key = week.map((day: any) => day.date).join(":");
@@ -175,7 +177,23 @@ class CalendarScreen extends React.Component<any, any> {
   }
 }
 
+const circleStyle = {
+  height: 36,
+  width: 36,
+  borderRadius: 18,
+  overflow: "hidden",
+  position: "relative",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
 const styles = StyleSheet.create({
+  button: {
+    height: 36,
+    width: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  } as ViewStyle,
   dayNames: {
     justifyContent: "space-between",
     flexDirection: "row",
@@ -208,62 +226,33 @@ const styles = StyleSheet.create({
     width: 30,
   },
 
-  circleDisabled: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+  circleDisabled: Object.assign({}, circleStyle, {
     borderWidth: 1,
     borderColor: "#aaaaaa",
-    overflow: "hidden",
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  } as ViewStyle,
+   }) as ViewStyle,
   circleTextDisabled: {
     color: "#aaaaaa"
   },
 
-  circleOutOfMonth: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+  circleOutOfMonth: Object.assign({}, circleStyle, {
     borderWidth: 1,
     borderColor: "#cccccc",
-    overflow: "hidden",
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  } as ViewStyle,
+   }) as ViewStyle,
   circleTextOutOfMonth: {
     color: "#cccccc"
   },
 
-  circleHasBookings: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+  circleHasBookings: Object.assign({}, circleStyle, {
     backgroundColor: "#fbece9",
-    overflow: "hidden",
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  } as ViewStyle,
+   }) as ViewStyle,
   circleTextHasBookings: {
     color: "black"
   },
 
-  circle: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
-    // backgroundColor: "#ff0000",
+  circle: Object.assign({}, circleStyle, {
     borderWidth: 1,
     borderColor: "#333333",
-    overflow: "hidden",
-    position: "relative",
-    justifyContent: "center",
-    alignItems: "center",
-  } as ViewStyle,
+   }) as ViewStyle,
   circleText: {
     color: "#333333"
   },

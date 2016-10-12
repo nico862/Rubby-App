@@ -8,17 +8,27 @@ import * as reactRedux from "react-redux";
 declare const fetch: (url: string, options?: Object) => Promise<any>;
 
 export function logout() {
-  return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
-    dispatch(logoutAction());
+  return (dispatch: reactRedux.Dispatch<any>, getState: any): void => {
+      console.log("logging out");
+      AsyncStorage.removeItem("apiAccessToken")
+        .then( () => dispatch(logoutAction()) );
+  };
+}
+
+function changeRoot(root: string) {
+  return {
+    type: types.ROOT_CHANGED,
+    payload: root
   };
 }
 
 export function appInitialized() {
   return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
-// AsyncStorage.removeItem("apiAccessToken").then(() => {
+    console.log("Initializing");
 
     getStoredToken()
       .then((tokenData) => {
+        console.log("token: " + tokenData);
         if (tokenData) {
           console.log(tokenData);
           // handle expired data
@@ -32,9 +42,8 @@ export function appInitialized() {
           }
         }
 
-        dispatch(logoutAction());
-      })
-      .catch(console.log);
+        dispatch(changeRoot("login"));
+      });
 // });
   };
 }
@@ -64,21 +73,27 @@ export function login(username: string, password: string) {
         "Authorization": `Basic ${ config.api.clientAuth }`
       }
     })
-      .then(res => res.json())
+      .then(validateResponse)
       .then(setStoredToken)
       .then((data) => {
         dispatch(loginSuccess(data));
       })
      .catch(err => {
-       console.log(err);
-//       dispatch(loginFail(err));
+       dispatch(loginError(err));
      });
   };
 }
 
+function validateResponse(res: any) {
+  if (!res.ok) {
+    throw new Error("FAIL_LOGIN");
+  }
+
+  return res.json();
+}
+
 function logoutAction() {
-  console.log("Here");
-  return {type: types.LOGOUT, payload: {}};
+  return {type: types.ROOT_CHANGED, payload: "login"};
 }
 
 function loginAttempt() {
@@ -92,6 +107,21 @@ function loginSuccess (sessionData: any) {
   };
 }
 
+function loginError (err: Error) {
+  let payload: string;
+
+  switch (err.message) {
+    case "FAIL_LOGIN":
+      payload = "Email adddress and password are not recognised";
+  }
+  console.log(payload);
+
+  return {
+    type: types.LOGIN_FAIL,
+    payload
+  };
+}
+
 function getStoredToken() {
   return AsyncStorage.getItem("apiAccessToken")
     .then((data) => {
@@ -100,6 +130,7 @@ function getStoredToken() {
 }
 
 function setStoredToken(tokenData: any) {
+  console.log("setting");
   return AsyncStorage.setItem("apiAccessToken", JSON.stringify(tokenData))
     .then(() => { return tokenData; });
 }

@@ -9,19 +9,30 @@ const initialState = Immutable({
 
 export default function app(state: any = initialState, action: any = {}): any {
   switch (action.type) {
+    case types.LOGIN_ATTEMPT:
+      return state.merge({
+        isLoggingIn: true,
+        error: null,
+      });
+
     case types.LOGIN_SUCCESS:
       return state.merge({
         rootLayout: "main",
         isLoggingIn: false,
         token: action.payload,
-        isAuthenticated: true
+        isAuthenticated: true,
+        error: null,
       });
 
-    case types.LOGOUT:
+    case types.LOGIN_FAIL:
       return state.merge({
-        rootLayout: "login",
         isLoggingIn: false,
-        isAuthenticated: false
+        error: action.payload,
+      });
+
+    case types.ROOT_CHANGED:
+      return state.merge({
+        rootLayout: action.payload,
       });
 
     default:

@@ -76,8 +76,8 @@ class CalendarDayScreen extends React.Component<any, any> {
           "Massage: 90 mins",
           "Another"
         ],
-        start: "2016-10-07T10:00:00+01:00",
-        end: "2016-10-07T12:45:00+01:00",
+        start: "2016-10-07T11:15:00+01:00",
+        end: "2016-10-07T11:45:00+01:00",
       }
     ];
 
@@ -278,6 +278,7 @@ const styles = StyleSheet.create({
     padding: 7,
     left: 0,
     right: 0,
+    overflow: "hidden",
   } as ViewStyle,
 
   bookingText: {

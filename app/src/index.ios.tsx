@@ -24,6 +24,7 @@ class App {
 
   onStoreUpdate() {
     const newRootLayout = store.getState().session.rootLayout;
+    console.log(newRootLayout);
 
     if (this.currentRootLayout !== newRootLayout) {
       this.currentRootLayout = newRootLayout;
