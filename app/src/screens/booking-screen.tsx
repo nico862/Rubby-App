@@ -22,26 +22,10 @@ interface BookingScreenState {
   booking: any;
 }
 
-const booking = {
-  id: 1,
-  time: "2016-10-01T13:00:00+01",
-  durationMinutes: 60,
-  treatmentName: "Massage",
-  customerName: "Pete Smith",
-  address: {
-    address1: "11 Edith Grove",
-    town: "London",
-    postcode: "SW10 0JZ"
-  }
-};
 
 export default class BookingScreen extends React.Component<BookingScreenProps, BookingScreenState> {
   constructor() {
     super();
-
-    this.state = {
-      booking
-    };
   }
 
   onChatPress() {
@@ -55,8 +39,9 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
     return moment(booking.timeEnds).isBefore(moment());
   }
 
-  onViewMapsPress(address: any) {
-    const url = `http://maps.apple.com/?address=${address.postcode}`;
+  onGetDirectionsPress(address: any) {
+    const encodedAddress = `${address.address1}, ${address.address2}, ${address.postcode}`;
+    const url = `http://maps.apple.com/?address=${encodeURIComponent(encodedAddress)}`;
     Linking.canOpenURL(url).then(supported => {
         if (!supported) {
           console.log("Can\'t handle url: " + url);
@@ -94,36 +79,16 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
     );
   }
 
-  renderMaps(booking: any) {
+  renderGetDirections(booking: any) {
     if (this.isPastBooking(booking)) {
       return;
     }
 
     return (
-      <MapView
-        style={{height: 200, margin: 40}}
-        showsUserLocation={true}
-        overlays={[]}
-
-        followUserLocation={true}
-      />
-    );
-  }
-
-  renderOpenInMaps(booking: any) {
-    if (this.isPastBooking(booking)) {
-      return;
-    }
-
-    return (
-      <View style={styles.container}>
-        <TouchableHighlight onPress={() => this.onViewMapsPress(booking.address)}
-          underlayColor="#dddddd">
-          <View>
-            <Text>Get directions</Text>
-          </View>
-        </TouchableHighlight>
-      </View>
+      <TouchableHighlight style={styles.directionsContainer} onPress={() => this.onGetDirectionsPress(booking.address)}
+        underlayColor="#dddddd">
+        <Text style={styles.directionsText}>Get directions</Text>
+      </TouchableHighlight>
     );
   }
 
@@ -156,8 +121,7 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
           <View>
             {this.renderAddress(booking)}
             {this.renderNotes(booking)}
-            {this.renderOpenInMaps(booking)}
-            {this.renderMaps(booking)}
+            {this.renderGetDirections(booking)}
           </View>
 
         </ScrollView>
@@ -195,6 +159,18 @@ const styles = StyleSheet.create({
   } as TextStyle,
   treatmentName: {
     flex: 1,
+  } as TextStyle,
+  directionsContainer: {
+    backgroundColor: "black",
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    marginTop: 20,
+
+  } as ViewStyle,
+  directionsText: {
+    color: "white"
   } as TextStyle
 
 });

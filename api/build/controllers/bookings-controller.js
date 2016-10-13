@@ -83,12 +83,10 @@ function index(req, res, next) {
     const user = res.locals.oauth.token.user;
     const start = moment().startOf("day").subtract(2, "months");
     const end = moment().startOf("day").add(2, "months");
-    services_1.bookingService.fetchBookingsForUser(user.id, { start: start, end: end })
+    services_1.bookingService.fetchBookingsForUser(user.id, { start, end })
         .then(sortBookings)
         .then(assignFields)
         .then((bookings) => res.json(divideByCompleted(bookings)))
         .catch(console.log);
 }
 exports.index = index;
-
-//# sourceMappingURL=bookings-controller.js.map

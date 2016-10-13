@@ -4,6 +4,9 @@ const urn_1 = require("../utils/urn");
 const db = require("../database");
 const models_1 = require("../models");
 function fetchCustomersByUrns(urns) {
+    if (urns.length === 0) {
+        return Promise.resolve([]);
+    }
     const ids = urns.map(urn_1.extractId);
     const query = squel.select(db.squelSelectOptions)
         .from("customers")

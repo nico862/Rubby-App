@@ -8,6 +8,9 @@ const squelSelectOptions = {
     replaceSingleQuotes: true,
 };
 function fetchSalonsByUrns(urns) {
+    if (urns.length === 0) {
+        return Promise.resolve([]);
+    }
     const ids = urns.map(urn_1.extractId);
     const query = squel.select(squelSelectOptions)
         .from("members_salons")

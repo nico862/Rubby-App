@@ -8,7 +8,11 @@ const squelSelectOptions = {
     replaceSingleQuotes: true,
 };
 function fetchCustomerAddressesByUrns(urns) {
+    if (urns.length === 0) {
+        return Promise.resolve([]);
+    }
     const ids = urns.map(urn_1.extractId);
+    console.log("ids", ids);
     const query = squel.select(squelSelectOptions)
         .from("customers_addresses")
         .where("customers_addresses_id IN ?", ids);
