@@ -111,7 +111,7 @@ class BookingsScreen extends React.Component<any, any> {
     });
 
     return (
-      <TouchableHighlight onPress={() => this.onBookingPress(booking.id)}
+      <TouchableHighlight onPress={() => this.onBookingPress(booking)}
         underlayColor="#dddddd">
         <View>
           <View style={styles.rowContainer}>
@@ -132,10 +132,14 @@ class BookingsScreen extends React.Component<any, any> {
     );
   }
 
-  onBookingPress(id: number) {
+  onBookingPress(booking: any) {
     this.props.navigator.push({
       title: "Booking",
-      screen: "RuubyPa.BookingScreen"
+      screen: "RuubyPA.BookingScreen",
+      backButtonTitle: "Back",
+      passProps: {
+        booking: booking
+      }
     });
   }
 
