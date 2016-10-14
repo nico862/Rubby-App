@@ -5,15 +5,22 @@
       true,
       "check-space"
     ],
+    "eofline": true,
     "indent": [
       true,
       "spaces"
     ],
+    "linebreak-style": [true, "LF"],
     "no-duplicate-variable": true,
     "no-eval": true,
     "no-internal-module": true,
     "no-trailing-whitespace": true,
     "no-var-keyword": true,
+    "no-unused-expression": true,
+    "no-unused-variable": [true, "react"],
+    "no-use-before-declare": true,
+    "no-unreachable": true,
+    "no-trailing-whitespace": true,
     "one-line": [
       true,
       "check-open-brace",

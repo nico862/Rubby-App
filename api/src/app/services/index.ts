@@ -1,3 +1,4 @@
+export {default as availabilityService} from "./availability-service";
 export {default as bookingService} from "./booking-service";
 export {default as bookingTreatmentService} from "./booking-treatment-service";
 export {default as salonService} from "./salon-service";

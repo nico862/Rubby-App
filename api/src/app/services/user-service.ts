@@ -1,12 +1,9 @@
-import * as express from "express";
 import * as squel from "squel";
-import * as pg from "pg";
 
-import config from "../config";
 import { extractId, convert } from "../utils/urn";
 import * as db from "../database";
 import { ResourceNotFound } from "../errors";
-import { User, UserParams } from "../models";
+import { User } from "../business-objects";
 
 const USER_NOT_FOUND = "USER_NOT_FOUND";
 
@@ -23,14 +20,14 @@ function findUserByEmailAndPassword(email: string, password: string): Promise<Us
     const row = rows[0];
 
     return new User({
-      urn: convert("user", row.member_id),
-      email: row.member_email,
+      urn: convert("user", [row["member_id"]]),
+      email: row["member_email"],
     });
   });
 }
 
 function fetchUserByUrn(urn: string): Promise<User> {
-  const id = extractId(urn);
+  const id = extractId("user", urn);
 
   const query = squel.select(db.squelSelectOptions)
     .from("members")
@@ -40,8 +37,8 @@ function fetchUserByUrn(urn: string): Promise<User> {
     const row = rows[0];
 
     return new User({
-      urn: convert("user", row.member_id),
-      email: row.member_email,
+      urn: convert("user", [row["member_id"]]),
+      email: row["member_email"],
     });
   });
 }
@@ -49,5 +46,5 @@ function fetchUserByUrn(urn: string): Promise<User> {
 export default {
   USER_NOT_FOUND,
   fetchUserByUrn,
-  findUserByEmailAndPassword
+  findUserByEmailAndPassword,
 };

@@ -58,8 +58,8 @@
         }
 
 declare module "express-oauth-server" {
-    import {RequestHandler} from "express";
-    import {Request, Application} from "express";
+    // import {RequestHandler} from "express";
+    // import {Request, Application} from "express";
 
     export class OAuthServer {
         constructor(config: Config)
@@ -70,8 +70,7 @@ declare module "express-oauth-server" {
 }
 
 declare module "oauth2-server" {
-    import {RequestHandler} from "express";
-    import {Request, Application} from "express";
+    import {Request } from "express";
 
         // interface OAuth2Server {
         //     grant(): RequestHandler;

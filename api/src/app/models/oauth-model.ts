@@ -1,46 +1,44 @@
 import * as jwt from "jsonwebtoken";
-import * as express from "express";
 import * as moment from "moment";
 
 import config from "../config";
-import { userService, oAuthClientService, oAuthRefreshTokenService } from "../services";
+import { userService, oAuthClientService, oAuthRefreshTokenService, salonService, therapistService } from "../services";
+import { User } from "../business-objects";
+import { SalonTherapist } from "./therapist-model";
 
 const secretKey = config.jwt.tokenSecret;
 const accessTokenExpiresDuration = moment.duration(config.jwt.expires);
 const refreshTokenExpiresDuration = moment.duration(config.jwt.expires).add(3600, "seconds");
 
+export interface UserSalonTherapist extends SalonTherapist {
+  user: User;
+}
+
 export default class OAuthModel {
   accessTokenLifetime = moment().add(accessTokenExpiresDuration).toDate();
 
-  getAccessToken (bearerToken: string): any {
-    console.log("in getAccessToken (bearerToken: " + bearerToken + ")");
+  getAccessToken (accessToken: string): any {
+    console.log("in getAccessToken (bearerToken: " + accessToken + ")");
 
-    const decoded = jwt.verify(bearerToken, secretKey, {
+    const user = jwt.verify(accessToken, secretKey, {
         ignoreExpiration: true // handled by OAuth2 server implementation
     });
 
-    return {
-      accessToken: bearerToken,
-      user: {
-        id: decoded.user
-      },
-    };
+    return {accessToken, user};
   };
 
   saveAuthorizationCode(authorizationCode: any): any {
     return {authorizationCode};
   }
 
-  saveToken (tokenObject: any, client: any, user: any): any {
+  saveToken (tokenObject: any, client: any, user: UserSalonTherapist): any {
     // Use JWT for access tokens
-    const accessToken = jwt.sign({
-      user: user.id
-    }, secretKey, {
+    const accessToken = jwt.sign(user, secretKey, {
       expiresIn: accessTokenExpiresDuration.asSeconds(),
     });
 
     // save refresh token
-    return oAuthRefreshTokenService.saveToken(tokenObject.refreshToken, client.id, user.id, moment().add(refreshTokenExpiresDuration))
+    return oAuthRefreshTokenService.saveToken(tokenObject.refreshToken, client.id, user.user.urn, moment().add(refreshTokenExpiresDuration))
       .then(() => {
         return {
           accessToken: accessToken,
@@ -66,22 +64,29 @@ export default class OAuthModel {
           grants: ["authorization_code", "password"]
         };
       })
-      .catch((err) => {
-        return;
-      });
+      .catch(console.log);
   };
 
-  getUser (username: string, password: string): Promise<any> {
+  getUser (username: string, password: string): Promise<UserSalonTherapist> {
     console.log("in getUser (username: " + username +
                 ", password: " + password + ")");
 
     return userService.findUserByEmailAndPassword(username, password)
-      .then((user) => {
-        console.log("User id: " + user.id);
-        return user;
-      })
-      .catch((err: Error) => {
-        return;
-      });
+      .then(mapUserSalonAndTherapist)
+      .catch(console.log);
   };
+}
+
+function mapUserSalonAndTherapist(user: User): Promise<UserSalonTherapist> {
+  return salonService.findSalonsForUser(user.urn)
+    .then(salons => {
+      return therapistService.findTherapistsForSalon(salons[0].urn)
+        .then(therapists => {
+        return {
+          user,
+          salon: salons[0],
+          therapist: therapists[0]
+        };
+      });
+    });
 }

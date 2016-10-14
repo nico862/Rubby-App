@@ -15,6 +15,85 @@ import {
 
 const moment = require("moment");
 
+const circleStyle = {
+  height: 36,
+  width: 36,
+  borderRadius: 18,
+  overflow: "hidden",
+  position: "relative",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const styles = StyleSheet.create({
+  button: {
+    height: 36,
+    width: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  } as ViewStyle,
+  dayNames: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignSelf: "stretch",
+    marginBottom: 5,
+  } as ViewStyle,
+  dayLetterContainer: {
+    width: 30,
+  } as ViewStyle,
+  dayLetter: {
+    color: "#666666",
+    textAlign: "center",
+    alignSelf: "stretch"
+  } as TextStyle,
+  month: {
+    color: "#666666",
+    textAlign: "center",
+    alignSelf: "stretch",
+    marginBottom: 5,
+  } as TextStyle,
+  week: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignSelf: "stretch",
+    marginBottom: 10,
+  } as ViewStyle,
+
+  emptyDay: {
+    height: 36,
+    width: 36,
+  },
+
+  circleOutOfMonth: Object.assign({}, circleStyle, {
+    borderWidth: 1,
+    borderColor: "#cccccc",
+   }) as ViewStyle,
+  circleTextOutOfMonth: {
+    color: "#cccccc"
+  },
+
+  circleHasBookings: Object.assign({}, circleStyle, {
+    backgroundColor: "#fbece9",
+   }) as ViewStyle,
+  circleTextHasBookings: {
+    color: "black"
+  },
+
+  circle: Object.assign({}, circleStyle, {
+    borderWidth: 1,
+    borderColor: "#333333",
+   }) as ViewStyle,
+  circleText: {
+    color: "#333333"
+  },
+
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    padding: 10,
+  } as TextStyle,
+});
+
 class CalendarScreen extends React.Component<any, any> {
   static navigatorStyle = {
     navBarBackgroundColor: "#fbece9",
@@ -176,101 +255,6 @@ class CalendarScreen extends React.Component<any, any> {
     );
   }
 }
-
-const circleStyle = {
-  height: 36,
-  width: 36,
-  borderRadius: 18,
-  overflow: "hidden",
-  position: "relative",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const styles = StyleSheet.create({
-  button: {
-    height: 36,
-    width: 36,
-    justifyContent: "center",
-    alignItems: "center",
-  } as ViewStyle,
-  dayNames: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    alignSelf: "stretch",
-    marginBottom: 5,
-  } as ViewStyle,
-  dayLetterContainer: {
-    width: 30,
-  } as ViewStyle,
-  dayLetter: {
-    color: "#666666",
-    textAlign: "center",
-    alignSelf: "stretch"
-  } as TextStyle,
-  month: {
-    color: "#666666",
-    textAlign: "center",
-    alignSelf: "stretch",
-    marginBottom: 5,
-  } as TextStyle,
-  week: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    alignSelf: "stretch",
-    marginBottom: 10,
-  } as ViewStyle,
-
-  emptyDay: {
-    height: 30,
-    width: 30,
-  },
-
-  circleDisabled: Object.assign({}, circleStyle, {
-    borderWidth: 1,
-    borderColor: "#aaaaaa",
-   }) as ViewStyle,
-  circleTextDisabled: {
-    color: "#aaaaaa"
-  },
-
-  circleOutOfMonth: Object.assign({}, circleStyle, {
-    borderWidth: 1,
-    borderColor: "#cccccc",
-   }) as ViewStyle,
-  circleTextOutOfMonth: {
-    color: "#cccccc"
-  },
-
-  circleHasBookings: Object.assign({}, circleStyle, {
-    backgroundColor: "#fbece9",
-   }) as ViewStyle,
-  circleTextHasBookings: {
-    color: "black"
-  },
-
-  circle: Object.assign({}, circleStyle, {
-    borderWidth: 1,
-    borderColor: "#333333",
-   }) as ViewStyle,
-  circleText: {
-    color: "#333333"
-  },
-
-  container: {
-    flex: 1,
-    // flexDirection: "column",
-    backgroundColor: "white",
-    padding: 10,
-    // alignItems: "flex-start",
-  } as TextStyle,
-  description: {
-    marginBottom: 20,
-    fontSize: 18,
-    textAlign: "center",
-    color: "#656565"
-  } as TextStyle,
-});
 
 // which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {

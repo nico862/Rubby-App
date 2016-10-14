@@ -1,7 +1,6 @@
 import * as types from "./action-types";
 import config from "../../config";
 
-import * as moment from "moment";
 import { AsyncStorage } from "react-native";
 import * as reactRedux from "react-redux";
 
@@ -59,7 +58,7 @@ export function login(username: string, password: string) {
       grant_type: "password",
     };
 
-    const postBody = Object.keys(postParams).map(key => {
+    const body = Object.keys(postParams).map(key => {
       const encodedKey = encodeURIComponent(key);
       const encodedValue = encodeURIComponent(postParams[key]);
       return `${encodedKey}=${encodedValue}`;
@@ -67,11 +66,11 @@ export function login(username: string, password: string) {
 
     fetch(`${ config.api.host }/oauth/token`, {
       method: "POST",
-      body: postBody,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": `Basic ${ config.api.clientAuth }`
-      }
+      },
+      body,
     })
       .then(validateResponse)
       .then(setStoredToken)

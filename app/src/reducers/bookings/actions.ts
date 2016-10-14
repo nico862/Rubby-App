@@ -15,7 +15,6 @@ export function fetchBookingsFail(err: Error) {
 
 export function fetchBookings() {
   return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
-
     const token = getState().session.token.access_token;
 
     fetch(`${ config.api.host }/bookings`, {

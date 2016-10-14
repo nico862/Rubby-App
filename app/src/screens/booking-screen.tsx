@@ -7,21 +7,60 @@ import {
   TextStyle,
   ViewStyle,
   TouchableHighlight,
-  MapView,
   Linking
 } from "react-native";
-import { SegmentedControls } from "react-native-radio-buttons";
-const moment = require("moment");
 
-interface BookingScreenProps {
+export interface BookingScreenProps {
   navigator: any;
   booking: any;
 }
 
-interface BookingScreenState {
+export interface BookingScreenState {
   booking: any;
 }
 
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    padding: 10,
+  } as TextStyle,
+  time: {
+    fontSize: 16,
+    fontWeight: "bold"
+  } as TextStyle,
+  fieldContainer: {
+    marginBottom: 15,
+  } as ViewStyle,
+  fieldHeading: {
+    fontSize: 11,
+    color: "#666666"
+  } as TextStyle,
+  headingContainer: {
+    marginBottom: 3,
+  } as ViewStyle,
+  treatmentContainer: {
+    flex: 1,
+    marginBottom: 2,
+    flexDirection: "row",
+    justifyContent: "space-between"
+  } as ViewStyle,
+  treatmentPrice: {
+  } as TextStyle,
+  treatmentName: {
+    flex: 1,
+  } as TextStyle,
+  directionsContainer: {
+    backgroundColor: "black",
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    marginTop: 20,
+  } as ViewStyle,
+  directionsText: {
+    color: "white"
+  } as TextStyle
+});
 
 export default class BookingScreen extends React.Component<BookingScreenProps, BookingScreenState> {
   constructor() {
@@ -128,49 +167,3 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    padding: 10,
-  } as TextStyle,
-  time: {
-    fontSize: 16,
-    fontWeight: "bold"
-  } as TextStyle,
-  fieldContainer: {
-    marginBottom: 15,
-  } as ViewStyle,
-  fieldHeading: {
-    fontSize: 11,
-    color: "#666666"
-  } as TextStyle,
-  headingContainer: {
-    marginBottom: 3,
-  } as ViewStyle,
-  treatmentContainer: {
-    flex: 1,
-    marginBottom: 2,
-    flexDirection: "row",
-    justifyContent: "space-between"
-  } as ViewStyle,
-  treatmentPrice: {
-    // flex: 1,
-  } as TextStyle,
-  treatmentName: {
-    flex: 1,
-  } as TextStyle,
-  directionsContainer: {
-    backgroundColor: "black",
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-    marginTop: 20,
-
-  } as ViewStyle,
-  directionsText: {
-    color: "white"
-  } as TextStyle
-
-});

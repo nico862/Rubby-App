@@ -1,6 +1,4 @@
 declare module "react-native-navigation" {
-  import * as React from "react";
-
   export interface NavigatorStyle {
     tabBarBackgroundColor?: string;
     navBarTextColor?: string;
@@ -72,14 +70,18 @@ declare module "react-native-navigation" {
   }
 
   export namespace Navigation {
+    /* tslint:disable:no-unused-variable */
     function registerComponent(screenId: string, generator: {(): any}, store?: any, provider?: any): void;
 
     function startTabBasedApp(config: TabBasedAppConfig): void;
 
     function startSingleScreenApp(config: SingleScreenAppConfig): void;
+    /* tslint:enable:no-unused-variable */
   }
 
   export namespace Navigator {
+    /* tslint:disable:no-unused-variable */
     function push(params: any): void;
+    /* tslint:enable:no-unused-variable */
   }
 }

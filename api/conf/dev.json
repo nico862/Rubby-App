@@ -26,5 +26,6 @@
   },
   "calendar": {
     "daysAhead": 31
-  }
+  },
+  "timezone": "Europe/London"
 }

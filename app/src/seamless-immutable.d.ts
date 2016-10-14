@@ -1,3 +1,10 @@
 declare module "seamless-immutable" {
-  export default function Immutable(object: any): any;
+  type Immutable = {
+    (obj: any, options?: any): any;
+    isImmutable(target: any): boolean;
+    ImmutableError(message: string): Error;
+  }
+
+  const Immutable: Immutable;
+  export = Immutable;
 }

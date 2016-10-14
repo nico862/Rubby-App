@@ -28,6 +28,7 @@ export interface Config {
   calendar: {
     daysAhead: number;
   };
+  timezone: string;
 }
 
 let confFile = "../../conf/dev.json";

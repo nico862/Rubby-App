@@ -13,25 +13,65 @@ import {
   StyleSheet,
   TextStyle,
   TouchableHighlight,
-  ListView,
-  ListViewDataSource,
-  RefreshControl,
-  AppState
+  ListView
 } from "react-native";
 
 const moment = require("moment");
 
-interface BookingsScreenProps {
-  navigator: any;
-}
+// interface BookingsScreenProps {
+//   navigator: any;
+// }
 
-interface BookingsScreenState {
-  selectedIndex?: number;
-  completedBookings?: ListViewDataSource;
-  upcomingBookings?: ListViewDataSource;
-  session: any;
-  visible: boolean;
-}
+// interface BookingsScreenState {
+//   selectedIndex?: number;
+//   completedBookings?: ListViewDataSource;
+//   upcomingBookings?: ListViewDataSource;
+//   session: any;
+//   visible: boolean;
+// }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  } as TextStyle,
+  textContainer: {
+    flex: 1
+  } as TextStyle,
+  separator: {
+    height: 1,
+    backgroundColor: "#dddddd"
+  } as TextStyle,
+  time: {
+    fontSize: 16,
+    color: "black",
+    fontWeight: "bold"
+  } as TextStyle,
+  treatment: {
+    fontSize: 14,
+    color: "black",
+    marginTop: 2,
+  } as TextStyle,
+  customer: {
+    fontSize: 14,
+    color: "black",
+    marginTop: 2,
+  } as TextStyle,
+  rowContainer: {
+    flexDirection: "row",
+    padding: 10
+  } as TextStyle,
+  segmentedButtons: {
+    margin: 10
+  },
+  noBookingsView: {
+    marginTop: 20,
+  },
+  noBookings: {
+    textAlign: "center",
+    color: "#666666"
+  } as TextStyle,
+});
 
 class BookingsScreen extends React.Component<any, any> {
   loadDataIntervalId: any;
@@ -242,49 +282,6 @@ class BookingsScreen extends React.Component<any, any> {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  } as TextStyle,
-  textContainer: {
-    flex: 1
-  } as TextStyle,
-  separator: {
-    height: 1,
-    backgroundColor: "#dddddd"
-  } as TextStyle,
-  time: {
-    fontSize: 16,
-    color: "black",
-    fontWeight: "bold"
-  } as TextStyle,
-  treatment: {
-    fontSize: 14,
-    color: "black",
-    marginTop: 2,
-  } as TextStyle,
-  customer: {
-    fontSize: 14,
-    color: "black",
-    marginTop: 2,
-  } as TextStyle,
-  rowContainer: {
-    flexDirection: "row",
-    padding: 10
-  } as TextStyle,
-  segmentedButtons: {
-    margin: 10
-  },
-  noBookingsView: {
-    marginTop: 20,
-  },
-  noBookings: {
-    textAlign: "center",
-    color: "#666666"
-  } as TextStyle,
-});
 
 // which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {

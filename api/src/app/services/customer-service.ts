@@ -1,17 +1,15 @@
-import * as express from "express";
 import * as squel from "squel";
 
-import config from "../config";
 import { extractId, convert } from "../utils/urn";
 import * as db from "../database";
-import { ResourceNotFound } from "../errors";
-import { Customer, CustomerParams } from "../models";
+import { Customer, CustomerParams } from "../business-objects";
 
 function fetchCustomersByUrns(urns: string[]): Promise<any> {
   if (urns.length === 0) {
     return Promise.resolve([]);
   }
-  const ids = urns.map(extractId);
+
+  const ids = urns.map(extractId.bind(null, ["customer"])).map(arr => arr[0]);
 
   const query = squel.select(db.squelSelectOptions)
       .from("customers")
@@ -24,7 +22,7 @@ function fetchCustomersByUrns(urns: string[]): Promise<any> {
 
 function mapRowToCustomer(row: any): Customer {
   const params: CustomerParams = {
-    urn: convert("customer", row.customer_id),
+    urn: convert("customer", [row.customer_id]),
     firstName: row.customer_fname,
     email: row.customer_email,
     lastName: row.customer_lname,

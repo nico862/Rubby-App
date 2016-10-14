@@ -1,7 +1,6 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as routes from "./routes";
-import config from "./config";
 
 const app: express.Express = express();
 

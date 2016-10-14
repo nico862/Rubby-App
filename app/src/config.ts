@@ -1,17 +1,32 @@
-import * as base64 from "base-64";
-
-const config = {
+export interface Config {
   api: {
-    // host: "http://192.168.15.71:8080",
-    host: "http://localhost:8080",
-    clientAuth: base64.encode([
-      "ruubyPAMobileApp",
-      "6468dd5c-8590-11e6-ae22-56b6b6499611"
-    ].join(":"))
-  },
+    host: string;
+    clientAuth: string;
+  };
+  timezone: string;
   timerIntervals: {
-    bookings: 1000 * 60 * 5
+    bookings: number;
+  }
+}
+
+// base config used for dev
+const config: Config = {
+  api: {
+    host: "http://localhost:8080/ruuby-pa",
+    clientAuth: "cnV1YnlQQU1vYmlsZUFwcDo2NDY4ZGQ1Yy04NTkwLTExZTYtYWUyMi01NmI2YjY0OTk2MTE="
+  },
+  timezone: "Europe/London",
+  timerIntervals: {
+    bookings: 1000 * 60 * 5 // 5 minutes
   }
 };
+
+// changes for production
+if (!__DEV__) {
+  config.api = {
+    host:  "https://app-api.ruuby.com/ruuby-pa",
+    clientAuth: "cnV1YnlQQU1vYmlsZUFwcDplOGEzNjNhNS01OTY5LTRiOTMtOTJlZS0xNWVjNWU2M2NhMTM"
+  };
+}
 
 export default config;
