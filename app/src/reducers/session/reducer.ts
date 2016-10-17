@@ -33,6 +33,7 @@ export default function app(state: any = initialState, action: any = {}): any {
     case types.ROOT_CHANGED:
       return state.merge({
         rootLayout: action.payload,
+        isAuthenticated: false
       });
 
     default:
