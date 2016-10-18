@@ -13,6 +13,9 @@ const squelSelectOptions: any = {
 };
 
 function fetchSalonsByUrns(urns: string[]): Promise<Salon[]> {
+  if (urns.length === 0) {
+    return Promise.resolve([]);
+  }
   const ids = urns.map(extractId);
 
   const query = squel.select(squelSelectOptions)

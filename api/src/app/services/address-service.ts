@@ -11,6 +11,9 @@ const squelSelectOptions: any = {
 };
 
 function fetchCustomerAddressesByUrns(urns: string[]): Promise<any> {
+  if (urns.length === 0) {
+    return Promise.resolve([]);
+  }
   const ids = urns.map(extractId);
 
   const query = squel.select(squelSelectOptions)

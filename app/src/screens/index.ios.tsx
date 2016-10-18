@@ -7,6 +7,7 @@ import CalendarScreen from "./calendar-screen";
 import CalendarDayScreen from "./calendar-day-screen";
 import LoginScreen from "./login-screen";
 
+
 // register all screens of the app (including internal ones)
 export function registerScreens(store: Redux.Store<any>, Provider: typeof ReactRedux.Provider) {
   Navigation.registerComponent("RuubyPA.ChatScreen", () => ChatScreen, store, Provider);

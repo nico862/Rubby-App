@@ -122,7 +122,10 @@ function sortBookings(bookings: Booking[]): Booking[] {
 export function index(req: express.Request, res: express.Response, next: express.NextFunction): void {
   const user = res.locals.oauth.token.user;
 
-  bookingService.fetchBookingsForUser(user.id)
+  const start = moment().startOf("day").subtract(2, "months");
+  const end = moment().startOf("day").add(2, "months");
+
+  bookingService.fetchBookingsForUser(user.id, {start, end})
     .then(sortBookings)
     .then(assignFields)
     .then((bookings) => res.json(divideByCompleted(bookings)))
