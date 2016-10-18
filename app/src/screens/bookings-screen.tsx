@@ -74,7 +74,6 @@ class BookingsScreen extends React.Component<any, any> {
   }
 
   onNavigatorEvent(event: any) {
-    console.log("event.type ", event.type);
     if (event.type === "NavBarButtonPress") {
       if (event.id === "user") {
         this.props.dispatch(sessionActions.logout());
@@ -82,12 +81,7 @@ class BookingsScreen extends React.Component<any, any> {
     }
   }
 
-  onDisplayed() {
-    console.log("onDisplayed");
-  }
-
   _handleAppStateChange(currentAppState: string) {
-    console.log("currentAppState", currentAppState);
     if (currentAppState === "active") {
       this._loadData();
       this._startDataInterval();
@@ -97,15 +91,12 @@ class BookingsScreen extends React.Component<any, any> {
   }
 
   _startDataInterval() {
-    console.log("starting interval");
     clearInterval(this.loadDataIntervalId); // clears this to be safe
     this.loadDataIntervalId = setInterval(this._loadData.bind(this), config.timerIntervals.bookings);
   }
 
   _loadData() {
-    console.log("this.props.session.isAuthenticated", this.props.session.isAuthenticated);
     if (this.props.session.isAuthenticated) {
-      console.log("loading data");
       this.props.dispatch(bookingsActions.fetchBookings());
     }
   }
