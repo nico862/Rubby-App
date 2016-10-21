@@ -4,6 +4,8 @@ import * as sessionActions from "../reducers/session/actions";
 import Spinner from "react-native-loading-spinner-overlay";
 import * as React from "react";
 import {connect} from "react-redux";
+import config from "../config";
+
 import { SegmentedControls } from "react-native-radio-buttons";
 import {
   Text,
@@ -13,6 +15,8 @@ import {
   TouchableHighlight,
   ListView,
   ListViewDataSource,
+  RefreshControl,
+  AppState
 } from "react-native";
 
 const moment = require("moment");
@@ -30,6 +34,8 @@ interface BookingsScreenState {
 }
 
 class BookingsScreen extends React.Component<any, any> {
+  loadDataIntervalId: any;
+
   static navigatorStyle = {
     navBarBackgroundColor: "#fbece9",
     navBarButtonColor: "black"
@@ -63,6 +69,8 @@ class BookingsScreen extends React.Component<any, any> {
     };
 
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    this._handleAppStateChange = this._handleAppStateChange.bind(this);
+
   }
 
   onNavigatorEvent(event: any) {
@@ -73,17 +81,42 @@ class BookingsScreen extends React.Component<any, any> {
     }
   }
 
-  componentDidMount() {
+  _handleAppStateChange(currentAppState: string) {
+    if (currentAppState === "active") {
+      this._loadData();
+      this._startDataInterval();
+    } else if (currentAppState === "inactive") {
+      clearInterval(this.loadDataIntervalId);
+    }
+  }
+
+  _startDataInterval() {
+    clearInterval(this.loadDataIntervalId); // clears this to be safe
+    this.loadDataIntervalId = setInterval(this._loadData.bind(this), config.timerIntervals.bookings);
+  }
+
+  _loadData() {
     if (this.props.session.isAuthenticated) {
       this.props.dispatch(bookingsActions.fetchBookings());
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.loadDataIntervalId);
+    AppState.removeEventListener("change", this._handleAppStateChange);
+  }
+
+  componentDidMount() {
+    AppState.addEventListener("change", this._handleAppStateChange);
+    this._loadData();
+    this._startDataInterval();
   }
 
   componentWillReceiveProps(nextProps: any) {
     if (nextProps.bookings.bookings !== this.props.bookings.bookings) {
       this.setState({
         completedBookings: this.state.completedBookings.cloneWithRows(nextProps.bookings.bookings.completed),
-        upcomingBookings: this.state.completedBookings.cloneWithRows(nextProps.bookings.bookings.upcoming)
+        upcomingBookings: this.state.upcomingBookings.cloneWithRows(nextProps.bookings.bookings.upcoming)
       });
     }
 
@@ -185,6 +218,8 @@ class BookingsScreen extends React.Component<any, any> {
     }
   }
 
+  // <Spinner visible={this.state.bookingsAreLoading} />
+
   render() {
     return (
         <View style={styles.container}>
@@ -199,7 +234,7 @@ class BookingsScreen extends React.Component<any, any> {
             />
           </View>
 
-          <Spinner visible={this.state.bookingsAreLoading} />
+
 
           { this.renderCompleted() }
           { this.renderUpcoming() }

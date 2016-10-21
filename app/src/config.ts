@@ -8,6 +8,9 @@ const config = {
       "ruubyPAMobileApp",
       "6468dd5c-8590-11e6-ae22-56b6b6499611"
     ].join(":"))
+  },
+  timerIntervals: {
+    bookings: 1000 * 60 * 5
   }
 };
 

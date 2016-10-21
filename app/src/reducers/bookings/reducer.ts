@@ -20,12 +20,6 @@ export default function bookings(state: any = initialState, action: any = {}): a
         loading: false,
       });
 
-    case types.FETCH_ATTEMPT:
-      return state.merge({
-        bookings: emptyBookings,
-        loading: true,
-      });
-
     default:
       return state;
   }

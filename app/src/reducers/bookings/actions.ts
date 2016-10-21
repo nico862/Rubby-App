@@ -5,10 +5,6 @@ import * as reactRedux from "react-redux";
 
 declare const fetch: (url: string, options?: Object) => Promise<any>;
 
-export function fetchBookingsAttempt() {
-  return {type: types.FETCH_ATTEMPT};
-}
-
 export function fetchBookingsSuccess(bookings: any) {
   return {type: types.FETCH_SUCCESS, bookings};
 }
@@ -21,7 +17,6 @@ export function fetchBookings() {
   return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
 
     const token = getState().session.token.access_token;
-    dispatch(fetchBookingsAttempt());
 
     fetch(`${ config.api.host }/bookings`, {
       method: "GET",
