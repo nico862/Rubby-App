@@ -5,6 +5,7 @@ import * as calendarController from "./controllers/calendar-controller";
 import * as therapistController from "./controllers/therapist-controller";
 import OAuthModel from "./models/oauth-model";
 import * as errorHandlers from "./error-handlers";
+import config from "./config";
 
 const OAuthServer = require("express-oauth-server");
 
@@ -43,21 +44,34 @@ export function configure(app: express.Application) {
   // Handle token grant requests
   app.all("/oauth/token", app["oauth"].token());
 
-  app.route("/therapist")
+  const router = express.Router();
+
+  router.route("/therapist")
     .get(app["oauth"].authenticate(), therapistController.index);
 
-  app.route("/bookings/")
+  router.route("/bookings/")
     .get(app["oauth"].authenticate(), bookingsController.index);
 
-  app.route("/calendar")
+  router.route("/calendar")
     .get(app["oauth"].authenticate(), calendarController.index);
 
-  app.route("/calendar/:date")
+  router.route("/calendar/:date")
     .get(app["oauth"].authenticate(), calendarController.getDayAvailability);
 
-  app.route("/availability")
+  router.route("/availability")
     .post(app["oauth"].authenticate(), calendarController.insertDayAvailability);
 
-  app.route("/availability/:availabilityUrn")
+  router.route("/availability/:availabilityUrn")
     .delete(app["oauth"].authenticate(), calendarController.deleteDayAvailability);
+
+  const packageInfo = require(`${config.pathToRoot}package.json`);
+  router.route("/status")
+    .get((req, res) => {
+      res.json({
+        status: "OK",
+        version: packageInfo.version,
+      });
+    });
+
+  app.use(config.baseUrl, router);
 };

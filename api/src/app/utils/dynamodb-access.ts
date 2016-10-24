@@ -11,7 +11,7 @@ const awsConfig: AwsClientConfig = {
   region: "eu-west-1",
 };
 
-if (config.dynamoDB.endpoint) {
+if (config.dynamoDB && config.dynamoDB.endpoint) {
   awsConfig.endpoint = config.dynamoDB.endpoint;
 }
 
