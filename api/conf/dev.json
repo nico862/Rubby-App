@@ -28,6 +28,6 @@
     "daysAhead": 31
   },
   "timezone": "Europe/London",
-  "baseUrl": "/ruuby-pa",
+  "baseUrlPath": "/ruuby-pa",
   "pathToRoot": "../../"
 }

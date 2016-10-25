@@ -113,7 +113,6 @@ function loginError (err: Error) {
     case "FAIL_LOGIN":
       payload = "Email adddress and password are not recognised";
   }
-  console.log(payload);
 
   return {
     type: types.LOGIN_FAIL,

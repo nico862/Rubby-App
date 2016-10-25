@@ -42,9 +42,9 @@ export function configure(app: express.Application) {
   });
 
   // Handle token grant requests
-  app.all("/oauth/token", app["oauth"].token());
-
   const router = express.Router();
+
+  router.all("/oauth/token", app["oauth"].token());
 
   router.route("/therapist")
     .get(app["oauth"].authenticate(), therapistController.index);
@@ -73,5 +73,5 @@ export function configure(app: express.Application) {
       });
     });
 
-  app.use(config.baseUrl, router);
+  app.use(config.baseUrlPath, router);
 };

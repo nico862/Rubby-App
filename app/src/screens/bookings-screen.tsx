@@ -1,7 +1,6 @@
 import * as bookingsActions from "../reducers/bookings/actions";
 import * as sessionActions from "../reducers/session/actions";
 
-import Spinner from "react-native-loading-spinner-overlay";
 import * as React from "react";
 import {connect} from "react-redux";
 import config from "../config";
@@ -13,7 +12,8 @@ import {
   StyleSheet,
   TextStyle,
   TouchableHighlight,
-  ListView
+  ListView,
+  AppState
 } from "react-native";
 
 const moment = require("moment");

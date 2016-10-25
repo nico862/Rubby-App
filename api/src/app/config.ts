@@ -29,7 +29,7 @@ export interface Config {
     daysAhead: number;
   };
   timezone: string;
-  baseUrl: string;
+  baseUrlPath: string;
   pathToRoot: string;
 }
 

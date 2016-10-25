@@ -77,11 +77,7 @@ gulp.task("compile-ts", ["ts-lint", "clean"], (cb) => {
     );
 });
 
-// used to copy the slack and sms message templates
-gulp.task("copy-message-templates", function() {
-  gulp.src("./src/**/*.hbs")
-    .pipe(gulp.dest("./build"));
-});
+gulp.task("build", ["compile-ts"]);
 
 gulp.task("tests", ["build"], (cb) => {
   if (hasError) {
@@ -117,8 +113,6 @@ gulp.task("watch", ["build"], () => {
 gulp.task("watch-tests", ["tests"], () => {
   gulp.watch([ "src/**/*.ts" ], ["tests"]);
 });
-
-gulp.task("build", ["copy-message-templates", "compile-ts"]);
 
 gulp.task("default", ["build"]);
 
