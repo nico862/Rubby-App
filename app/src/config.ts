@@ -6,7 +6,7 @@ export interface Config {
   timezone: string;
   timerIntervals: {
     bookings: number;
-  }
+  };
 }
 
 // base config used for dev

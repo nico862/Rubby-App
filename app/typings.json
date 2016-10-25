@@ -8,8 +8,5 @@
     "react-redux": "registry:dt/react-redux#4.4.0+20160908183346",
     "redux": "registry:dt/redux#3.5.2+20160703092728",
     "redux-thunk": "registry:dt/redux-thunk#2.1.0+20160703120921"
-  },
-  "dependencies": {
-    "base-64": "registry:npm/base-64#0.1.0+20160522191830"
   }
 }
