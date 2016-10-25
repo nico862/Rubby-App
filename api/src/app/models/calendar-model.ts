@@ -1,4 +1,3 @@
-import * as express from "express";
 import * as moment from "moment";
 import "moment-timezone";
 import "moment-range";
@@ -9,7 +8,7 @@ import { bookingService, availabilityService } from "../services";
 import * as bookingsModel from "./bookings-model";
 import { Booking, Availability } from "../business-objects";
 import { mapRowToAvailability } from "../services/model-helper";
-import {location} from "../utils/http";
+import * as httpUtils from "../utils/http";
 import config from "../config";
 
 export interface Day {
@@ -45,15 +44,14 @@ function getDates(start: moment.Moment, end: moment.Moment, bookings: Booking[])
   while (month.month() <= end.month()) {
     const monthCalendar = new calendar.Calendar().monthdatescalendar(month.year(), month.month() + 1);
 
-    const weeks = monthCalendar.filter(week => {
-      const contains = week.filter(date => {
+    const weeksInRange = monthCalendar.filter(week => {
+      return week.some(date => {
         const day = moment(date);
         return (day.isAfter(start) && day.isBefore(end));
       });
+    });
 
-      return contains.length > 0;
-    })
-    .map(week => {
+    const weeks = weeksInRange.map(week => {
       return week.map(dateString => {
         const date = moment(dateString);
         const day: Day = {
@@ -61,9 +59,10 @@ function getDates(start: moment.Moment, end: moment.Moment, bookings: Booking[])
           date: date.format("YYYY-MM-DD"),
         };
 
-        if (date.month() !== month.month()) day.notInMonth = true;
-        if (date.isBefore(start) || date.isAfter(end)) day.isDisabled = true;
-        if (bookingsMap[ date.format("YYYY-MM-DD") ]) day.hasBookings = true;
+        day.notInMonth = (date.month() !== month.month());
+        day.isDisabled = (date.isBefore(start) || date.isAfter(end));
+        day.hasBookings = (bookingsMap[ date.format("YYYY-MM-DD") ]);
+
         return day;
       });
     });
@@ -91,7 +90,7 @@ export interface BookingAvailability {
   hours: AvailabilityHour[];
 }
 
-export function getAvailabilityForTherapistForDay(req: express.Request, therapistUrn: string, start: moment.Moment): Promise<BookingAvailability> {
+export function getAvailabilityForTherapistForDay(req: httpUtils.RequestParams, therapistUrn: string, start: moment.Moment): Promise<BookingAvailability> {
   const end = start.clone().endOf("day");
 
   return Promise.all([
@@ -114,7 +113,7 @@ export function getAvailabilityForTherapistForDay(req: express.Request, therapis
     });
 }
 
-function annotateAvailability(req: express.Request, start: moment.Moment, availability: Availability[], bookings: Booking[]): AvailabilityHour[] {
+function annotateAvailability(req: httpUtils.RequestParams, start: moment.Moment, availability: Availability[], bookings: Booking[]): AvailabilityHour[] {
   return _.range(0, 24).map(hour => {
     const hourStart = start.clone().add(hour, "hour");
     const hourEnd = hourStart.clone().endOf("hour");
@@ -135,7 +134,7 @@ function annotateAvailability(req: express.Request, start: moment.Moment, availa
     const data: AvailabilityHour = {hour, isAvailable, hasBooking};
 
     if (isAvailable) {
-      data.location = location(req, `/availability/${hourAvailability[0].urn}`);
+      data.location = httpUtils.location(req, `/availability/${hourAvailability[0].urn}`);
     }
 
     return data;

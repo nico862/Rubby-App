@@ -47,13 +47,13 @@ export function configure(app: express.Application) {
   router.all("/oauth/token", app["oauth"].token());
 
   router.route("/therapist")
-    .get(app["oauth"].authenticate(), therapistController.index);
+    .get(app["oauth"].authenticate(), therapistController.showTherapist);
 
   router.route("/bookings/")
-    .get(app["oauth"].authenticate(), bookingsController.index);
+    .get(app["oauth"].authenticate(), bookingsController.listBookings);
 
   router.route("/calendar")
-    .get(app["oauth"].authenticate(), calendarController.index);
+    .get(app["oauth"].authenticate(), calendarController.showCalendar);
 
   router.route("/calendar/:date")
     .get(app["oauth"].authenticate(), calendarController.getDayAvailability);
