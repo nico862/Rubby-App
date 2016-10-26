@@ -9,6 +9,7 @@
 
 #import "AppDelegate.h"
 
+// The following line for production
 // #import "RCTBundleURLProvider.h"
 #import "RCCManager.h"
 #import "RCTRootView.h"
@@ -19,8 +20,13 @@
 {
   NSURL *jsCodeLocation;
 
+  // The following line for development on device (uses your machine's IP address)
   // jsCodeLocation = [NSURL URLWithString:@"http://192.168.15.71:8081/build/index.ios.bundle?platform=ios&dev=true"];
+
+  // The following line for dev in simulator
   jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/build/index.ios.bundle?platform=ios&dev=true"];
+
+  // The following line for production (see include statement above)
   // jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"build/index.ios" fallbackResource:nil];
 
   // **********************************************

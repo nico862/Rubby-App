@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import {logger} from "./logger";
-import { ValidationError, ResourceNotFound } from "./errors";
+import { ResourceNotFound } from "./errors";
 
 const OAuth2Error: any = require("oauth2-server");
 

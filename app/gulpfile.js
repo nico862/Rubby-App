@@ -56,7 +56,6 @@ gulp.task("compile-ts", ["ts-lint", "clean"], (cb) => {
       "src/**/*.tsx",
       "src/**/*.ts",
       "typings/index.d.ts",
-      "node_modules/moment/moment.d.ts"
     ] )
     .pipe( tsc(tsProject) )
     .on("error", () => { hasError = true; });

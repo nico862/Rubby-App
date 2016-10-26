@@ -26,5 +26,8 @@
   },
   "calendar": {
     "daysAhead": 31
-  }
+  },
+  "timezone": "Europe/London",
+  "baseUrlPath": "/ruuby-pa",
+  "pathToRoot": "../../"
 }

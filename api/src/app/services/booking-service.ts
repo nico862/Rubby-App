@@ -1,50 +1,33 @@
-import * as express from "express";
 import * as axios from "axios";
-import * as squel from "squel";
 import * as url from "url";
 import * as moment from "moment";
 
 import config from "../config";
-import { extractId, convert } from "../utils/urn";
-import { Booking, BookingParams } from "../models";
-import * as db from "../database";
+import { Booking, BookingParams } from "../business-objects";
 
 export interface BookingSearchOptions {
   start: moment.Moment;
   end: moment.Moment;
 }
 
-function fetchBookingsForUser(userUrn: string, options?: BookingSearchOptions): Promise<any> {
-  const userId = extractId(userUrn);
+function fetchBookingsForTherapist(therapistUrn: string, options?: BookingSearchOptions): Promise<Booking[]> {
+  // get bookings for all salons fetched
+  return new Promise((resolve, reject) => {
+    const reqUrl = url.parse(`${config.bookingsApi.endpoint}/bookings`);
+    reqUrl.query = {therapistUrn};
 
-  // get salons for user
-  const query = squel.select(db.squelSelectOptions)
-      .from("members_salons")
-      .where("member_id = ?", userId);
+    if (options) {
+      if (options.start && options.end) {
+        reqUrl.query.overlaps = `${options.start.toISOString()} TO ${options.end.toISOString()}`;
+      }
+    }
 
-  return db.doSelect(query)
-    .then((rows: any) => {
-      return rows.map((row: any) => row.salon_unique_id);
-    })
-    .then((salonIds) => {
-      // get bookings for all salons fetched
-      return new Promise((resolve, reject) => {
-        const reqUrl = url.parse(`${config.bookingsApi.endpoint}/bookings`);
-        reqUrl.query = {salonUrn: salonIds.map((id: string) => convert("salon", id))};
-
-        if (options) {
-          if (options.start && options.end) {
-            reqUrl.query.overlaps = `${options.start.toISOString()} TO ${options.end.toISOString()}`;
-          }
-        }
-
-        axios.get(url.format(reqUrl))
-          .then(function (response: any) {
-            resolve(response.data.map(mapToBooking));
-          })
-          .catch(function (error: Error) {
-            reject(error);
-          });
+    axios.get(url.format(reqUrl))
+      .then(function (response: any) {
+        resolve(response.data.map(mapToBooking));
+      })
+      .catch(function (error: Error) {
+        reject(error);
       });
   });
 }
@@ -67,5 +50,5 @@ function mapToBooking(data: any): Booking {
 }
 
 export default {
-  fetchBookingsForUser
+  fetchBookingsForTherapist
 };

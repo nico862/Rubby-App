@@ -1,8 +1,6 @@
 import * as AWS from "aws-sdk";
-import * as uuid from "node-uuid";
 import * as moment from "moment";
 import * as oauthServer from "oauth2-server";
-import * as bcrypt from "bcrypt";
 
 import * as dynamoDb from "../utils/dynamodb-access";
 import { ResourceNotFound } from "../errors";
@@ -10,7 +8,6 @@ import { ResourceNotFound } from "../errors";
 const REFRESH_TOKEN_NOT_FOUND = "REFRESH_TOKEN_NOT_FOUND";
 
 const table = "RuubyPAOauthRefreshTokens";
-const tokenExpiryDays = 1;
 
 function getToken(token: string): Promise<oauthServer.RefreshToken> {
   const params: AWS.DynamoDB.GetParam = {

@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "module": "commonjs",
     "moduleResolution": "node",
     "jsx": "react",
     "outDir": "build/",
-    "sourceMap": true,
+    "removeComments": false,
     "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true
+    "suppressImplicitAnyIndexErrors": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": [
     "node_modules"

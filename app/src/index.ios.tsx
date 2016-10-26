@@ -1,6 +1,6 @@
 import {createStore, applyMiddleware, combineReducers} from "redux";
 import {Provider} from "react-redux";
-import {Navigation, NavigatorButtonsConfig} from "react-native-navigation";
+import {Navigation} from "react-native-navigation";
 import thunk from "redux-thunk";
 
 import reducers from "./reducers/index";
@@ -24,7 +24,6 @@ class App {
 
   onStoreUpdate() {
     const newRootLayout = store.getState().session.rootLayout;
-    console.log(newRootLayout);
 
     if (this.currentRootLayout !== newRootLayout) {
       this.currentRootLayout = newRootLayout;
@@ -86,4 +85,4 @@ class App {
   }
 }
 
-const app = new App();
+new App();

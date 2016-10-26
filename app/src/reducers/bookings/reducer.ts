@@ -1,5 +1,4 @@
-import Immutable from "seamless-immutable";
-import { Reducer } from "redux";
+import * as Immutable from "seamless-immutable";
 
 import * as types from "./action-types";
 

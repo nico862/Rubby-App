@@ -1,9 +1,7 @@
-import * as express from "express";
 import * as axios from "axios";
 
 import config from "../config";
-import { Booking, BookingTreatment, BookingTreatmentParams } from "../models";
-import * as db from "../database";
+import { Booking, BookingTreatment, BookingTreatmentParams } from "../business-objects";
 import { extractId } from "../utils/urn";
 
 function fetchBookingTreatments(booking: Booking): Promise<any> {
@@ -20,7 +18,7 @@ function fetchBookingTreatments(booking: Booking): Promise<any> {
 
 function mapToBookingTreatment(data: any): BookingTreatment {
   const params: BookingTreatmentParams = {
-    id: extractId(data["@id"]),
+    id: extractId("booking-treatment", data["@id"])[0],
     urn: data["@id"],
     bookingId: data.bookingId,
     treatmentUrn: data.treatmentUrn,

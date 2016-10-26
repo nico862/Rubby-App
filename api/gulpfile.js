@@ -19,16 +19,17 @@ const shell = require('gulp-shell')
 
 const tsProject = tsc.createProject("tsconfig.json");
 let hasError = false;
+const app_id = "ruuby-pa-api";
 
 // remove all built files
 gulp.task("clean", () => {
   const filesToClean = [
-    "build/**/*.js",      // path to all JS files auto gen"d by editor
-    "build/**/*.js.map",  // path to all sourcemap files auto gen"d by editor
-    "build/**/*.d.ts",    // path to all JS files auto gen"d by editor
-    "build/**/*.hbs",     // path to the handlebar template files
-    "dist/**/*",          // path to the distribution directory
-    "dist-zip/**/*"       // path to the distribution archive directory
+    "build/**/*.js",
+    "build/**/*.js.map",
+    "build/**/*.d.ts",
+    "build/**/*.hbs",
+    "dist/**/*",
+    "dist-zip/**/*"
   ];
 
   return del(filesToClean);
@@ -76,11 +77,7 @@ gulp.task("compile-ts", ["ts-lint", "clean"], (cb) => {
     );
 });
 
-// used to copy the slack and sms message templates
-gulp.task("copy-message-templates", function() {
-  gulp.src("./src/**/*.hbs")
-    .pipe(gulp.dest("./build"));
-});
+gulp.task("build", ["compile-ts"]);
 
 gulp.task("tests", ["build"], (cb) => {
   if (hasError) {
@@ -93,16 +90,6 @@ gulp.task("tests", ["build"], (cb) => {
     .on("error", handleError);
 });
 
-gulp.task("make-client-dist", function() {
-  return gulp.src('package.json', {read: false})
-    .pipe(shell('npm run deploy:prod', {cwd: "../client"}));
-});
-
-gulp.task("move-client-dist", ["make-client-dist"], function() {
-  return gulp.src('../client/dist/**/*')
-    .pipe(gulp.dest('./dist/public'));
-});
-
 gulp.task("make-dist", ["tests"], () => {
   mkdirp("./dist");
 
@@ -110,54 +97,22 @@ gulp.task("make-dist", ["tests"], () => {
     .pipe(gulp.dest("./dist"));
 });
 
-gulp.task("archive", ["get-prod-config", "install-dist-packages"], () => {
+gulp.task("archive", ["make-dist"], () => {
   mkdirp("./dist-zip");
   const p = require("./package.json");
 
   return gulp.src("./dist/**/*", {base: "./dist"})
-    .pipe(zip(`bookings-api-${p.version}.zip`))
+    .pipe(zip(`${app_id}-${p.version}.zip`))
     .pipe(gulp.dest("./dist-zip"));
 });
 
-gulp.task("get-prod-config", ["make-dist"], () => {
-  return s3.src("s3://ruuby-configuration/admin-panel-api/config.js")
-    .pipe(flatten())
-    .pipe(gulp.dest("./dist"));
-});
-
-gulp.task("install-dist-packages", ["make-dist"], () => {
-  return gulp.src(["./dist/package.json"])
-    .pipe(install({
-      production: true,
-      ignoreScripts: true
-    }));
-});
-
-gulp.task("get-prod-config", ["bundle-release"], () => {
-  // TODO: add this when needed
-  // return s3.src("s3://ruuby-configuration/admin-panel/config.js")
-  //   .pipe(flatten())
-  //   .pipe(gulp.dest("./dist"));
-});
-
-// gulp.task("archive", ["get-prod-config", "get-prod-config"], () => {
-//   mkdirp("./dist-zip");
-//   const p = require("./package.json");
-//
-//   return gulp.src("./dist/**/*", {base: "./dist"})
-//     .pipe(zip(`admin-panel-${p.version}.zip`))
-//     .pipe(gulp.dest("./dist-zip"));
-// });
-
 gulp.task("watch", ["build"], () => {
-  gulp.watch([ "src/**/*.ts", "src/**/*.hbs", ], ["build"]);
+  gulp.watch([ "src/**/*.ts" ], ["build"]);
 });
 
 gulp.task("watch-tests", ["tests"], () => {
-  gulp.watch([ "src/**/*.ts", "src/**/*.hbs", ], ["tests"]);
+  gulp.watch([ "src/**/*.ts" ], ["tests"]);
 });
-
-gulp.task("build", ["copy-message-templates", "compile-ts"]);
 
 gulp.task("default", ["build"]);
 

@@ -24,3 +24,9 @@ export class ResourceNotFound extends ExtendableError {
     super(message);
   }
 }
+
+export class UpdateFailed extends ExtendableError {
+  constructor(message: string) {
+    super(message);
+  }
+}

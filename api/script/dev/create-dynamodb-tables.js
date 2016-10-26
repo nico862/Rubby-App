@@ -35,6 +35,34 @@ createTable({
     }
 });
 
+createTable({
+    TableName : "TherapistAvailability",
+    KeySchema: [
+        {
+            AttributeName: "therapistUrn",
+            KeyType: "HASH"
+        },
+        {
+            AttributeName: "timeStarts",
+            KeyType: "RANGE"
+        },
+    ],
+    AttributeDefinitions: [
+        {
+            AttributeName: "therapistUrn",
+            AttributeType: "S"
+        },
+        {
+            AttributeName: "timeStarts",
+            AttributeType: "S"
+        },
+    ],
+    ProvisionedThroughput: {
+        ReadCapacityUnits: 40,
+        WriteCapacityUnits: 20
+    }
+});
+
 function createTable (params) {
     dynamodb.createTable(params, (err, data) => {
         if (err) {

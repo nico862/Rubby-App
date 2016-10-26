@@ -2,8 +2,10 @@ import * as express from "express";
 
 import * as bookingsController from "./controllers/bookings-controller";
 import * as calendarController from "./controllers/calendar-controller";
-import OAuthModel from "./models/oauth";
+import * as therapistController from "./controllers/therapist-controller";
+import OAuthModel from "./models/oauth-model";
 import * as errorHandlers from "./error-handlers";
+import config from "./config";
 
 const OAuthServer = require("express-oauth-server");
 
@@ -16,8 +18,6 @@ export interface OAuthApp extends express.Application {
  * @param {express.Application} app An Express app
  */
 export function configure(app: express.Application) {
-  app.use(express.static(__dirname + "/public"));
-
   app.use(function (req, res, next) {
     // Website you wish to allow to connect
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -42,12 +42,36 @@ export function configure(app: express.Application) {
   });
 
   // Handle token grant requests
-  app.all("/oauth/token", app["oauth"].token());
+  const router = express.Router();
 
-  app.route("/bookings")
-    .get(app["oauth"].authenticate(), bookingsController.index);
+  router.all("/oauth/token", app["oauth"].token());
 
-  app.route("/calendar")
-    .get(app["oauth"].authenticate(), calendarController.index);
+  router.route("/therapist")
+    .get(app["oauth"].authenticate(), therapistController.showTherapist);
 
+  router.route("/bookings/")
+    .get(app["oauth"].authenticate(), bookingsController.listBookings);
+
+  router.route("/calendar")
+    .get(app["oauth"].authenticate(), calendarController.showCalendar);
+
+  router.route("/calendar/:date")
+    .get(app["oauth"].authenticate(), calendarController.getDayAvailability);
+
+  router.route("/availability")
+    .post(app["oauth"].authenticate(), calendarController.insertDayAvailability);
+
+  router.route("/availability/:availabilityUrn")
+    .delete(app["oauth"].authenticate(), calendarController.deleteDayAvailability);
+
+  const packageInfo = require(`${config.pathToRoot}package.json`);
+  router.route("/status")
+    .get((req, res) => {
+      res.json({
+        status: "OK",
+        version: packageInfo.version,
+      });
+    });
+
+  app.use(config.baseUrlPath, router);
 };

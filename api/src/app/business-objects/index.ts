@@ -6,3 +6,4 @@ export * from "./booking-treatment";
 export * from "./treatment";
 export * from "./therapist";
 export * from "./user";
+export * from "./availability";

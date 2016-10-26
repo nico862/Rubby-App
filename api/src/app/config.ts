@@ -22,16 +22,19 @@ export interface Config {
     tokenSecret: string;
     expires: number;
   };
-  dynamoDB: {
+  dynamoDB?: {
     endpoint?: string;
   };
   calendar: {
     daysAhead: number;
   };
+  timezone: string;
+  baseUrlPath: string;
+  pathToRoot: string;
 }
 
 let confFile = "../../conf/dev.json";
-if (process.env.RUUBY_PA_API_CONFIG_FILE) confFile = process.env.RUUBY_PA_API_CONFIG_FILE;
+if (process.env.RUUBY_NODEAPP_CONFIG_FILE) confFile = process.env.RUUBY_NODEAPP_CONFIG_FILE;
 
 const config: Config = require(confFile);
 

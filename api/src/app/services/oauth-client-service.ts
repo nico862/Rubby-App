@@ -1,6 +1,4 @@
 import * as AWS from "aws-sdk";
-import * as uuid from "node-uuid";
-import * as moment from "moment";
 import * as oauthServer from "oauth2-server";
 import * as bcrypt from "bcrypt";
 
@@ -10,7 +8,6 @@ import { ResourceNotFound } from "../errors";
 const CLIENT_NOT_FOUND = "CLIENT_NOT_FOUND";
 
 const table = "RuubyPAOauthClients";
-const tokenExpiryDays = 1;
 
 function getClient(clientUrn: string, clientSecret: string): Promise<oauthServer.Client> {
   const params: AWS.DynamoDB.GetParam = {

@@ -11,12 +11,110 @@ import {
   Image,
   TouchableOpacity,
   StatusBar,
-  NativeSyntheticEvent,
   Animated,
 } from "react-native";
 import {connect} from "react-redux";
 
 import * as sessionActions from "../reducers/session/actions";
+
+const windowSize = Dimensions.get("window");
+const styles = StyleSheet.create({
+    container: {
+      flexDirection: "column",
+      flex: 1,
+      backgroundColor: "transparent"
+    } as TextStyle,
+    bg: {
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: windowSize.width,
+        height: windowSize.height
+    } as ImageStyle,
+    // bgTint: {
+    //     position: "absolute",
+    //     left: 0,
+    //     top: 0,
+    //     width: windowSize.width,
+    //     height: windowSize.height,
+    //     backgroundColor: "rgba(116, 109, 108, 0.55)"
+    // } as TextStyle,
+    header: {
+        justifyContent: "center",
+        alignItems: "center",
+        flex: .5,
+        backgroundColor: "transparent"
+    } as TextStyle,
+    logo: {
+        width: 200,
+        height: 84,
+        tintColor: "white"
+    },
+    signin: {
+        backgroundColor: "black",
+        alignItems: "center",
+        justifyContent: "center",
+        height: 55,
+    } as TextStyle,
+    footer: {
+      flex: .15
+    } as TextStyle,
+    inputs: {
+        marginTop: 10,
+        flex: .25,
+    } as ViewStyle,
+    inputContainer: {
+        padding: 10,
+        borderWidth: 1,
+        height: 41,
+        borderBottomColor: "#CCC",
+        borderColor: "transparent"
+    },
+    input: {
+        position: "absolute",
+        left: 61,
+        top: 12,
+        right: 0,
+        height: 20,
+        fontSize: 14
+    },
+    forgotContainer: {
+      alignItems: "flex-end",
+      padding: 15,
+    } as TextStyle,
+    greyFont: {
+      color: "#D8D8D8"
+    },
+    whiteFont: {
+      color: "#FFF"
+    },
+    pinkFont: {
+      color: "#fbece9"
+    },
+    signinButtonContainer: {
+      height: 85,
+      // flexShrink: 0,
+    } as ViewStyle,
+    errorContainer: {
+      position: "relative",
+      overflow: "hidden",
+      height: 30,
+    } as ViewStyle,
+    error: {
+      left: 0,
+      right: 0,
+      padding: 5,
+      height: 30,
+      backgroundColor: "red",
+      position: "absolute",
+      alignItems: "center",
+      justifyContent: "center",
+    } as ViewStyle,
+    errorText: {
+      color: "white",
+      fontSize: 12,
+    } as TextStyle
+});
 
 interface LoginScreenState {
   username?: string;
@@ -157,105 +255,6 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
     );
   }
 }
-
-const windowSize = Dimensions.get("window");
-const styles = StyleSheet.create({
-    container: {
-      flexDirection: "column",
-      flex: 1,
-      backgroundColor: "transparent"
-    } as TextStyle,
-    bg: {
-        position: "absolute",
-        left: 0,
-        top: 0,
-        width: windowSize.width,
-        height: windowSize.height
-    } as ImageStyle,
-    // bgTint: {
-    //     position: "absolute",
-    //     left: 0,
-    //     top: 0,
-    //     width: windowSize.width,
-    //     height: windowSize.height,
-    //     backgroundColor: "rgba(116, 109, 108, 0.55)"
-    // } as TextStyle,
-    header: {
-        justifyContent: "center",
-        alignItems: "center",
-        flex: .5,
-        backgroundColor: "transparent"
-    } as TextStyle,
-    logo: {
-        width: 200,
-        height: 84,
-        tintColor: "white"
-    },
-    signin: {
-        backgroundColor: "black",
-        alignItems: "center",
-        justifyContent: "center",
-        height: 55,
-    } as TextStyle,
-    footer: {
-      flex: .15
-    } as TextStyle,
-    inputs: {
-        marginTop: 10,
-        flex: .25,
-    } as ViewStyle,
-    inputContainer: {
-        padding: 10,
-        borderWidth: 1,
-        height: 41,
-        borderBottomColor: "#CCC",
-        borderColor: "transparent"
-    },
-    input: {
-        position: "absolute",
-        left: 61,
-        top: 12,
-        right: 0,
-        height: 20,
-        fontSize: 14
-    },
-    forgotContainer: {
-      alignItems: "flex-end",
-      padding: 15,
-    } as TextStyle,
-    greyFont: {
-      color: "#D8D8D8"
-    },
-    whiteFont: {
-      color: "#FFF"
-    },
-    pinkFont: {
-      color: "#fbece9"
-    },
-    signinButtonContainer: {
-      height: 85,
-      // flexShrink: 0,
-    } as ViewStyle,
-    errorContainer: {
-      position: "relative",
-      overflow: "hidden",
-      height: 30,
-    } as ViewStyle,
-    error: {
-      left: 0,
-      right: 0,
-      padding: 5,
-      height: 30,
-      backgroundColor: "red",
-      position: "absolute",
-      alignItems: "center",
-      justifyContent: "center",
-    } as ViewStyle,
-    errorText: {
-      color: "white",
-      fontSize: 12,
-    } as TextStyle
-});
 
 // which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {
