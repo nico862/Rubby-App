@@ -1,5 +1,7 @@
 import * as React from "react";
 import * as moment from "moment";
+import config from "../config";
+
 import {
   Text,
   View,
@@ -10,6 +12,7 @@ import {
   TouchableHighlight,
   Linking
 } from "react-native";
+
 
 export interface BookingScreenProps {
   navigator: any;
@@ -76,6 +79,8 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
   }
 
   isPastBooking(booking: any) {
+    // using booking.timeEnds so that the details of the booking
+    // are only hidden once the treatment is over
     return moment(booking.timeEnds).isBefore(moment());
   }
 

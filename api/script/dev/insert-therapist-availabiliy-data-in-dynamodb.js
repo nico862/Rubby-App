@@ -12,9 +12,9 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 var params = {
     TableName: 'TherapistAvailability',
     Item: {
-        therapistUrn: 'urn:ruuby:therapist:283876728-1',
-        timeStarts:   '2016-10-22T10:00:00.000Z',
-        timeEnds:     '2016-10-22T11:00:00.000Z'
+        therapistUrn: 'urn:ruuby:therapist:315942482-4',
+        timeStarts:   '2016-10-28T10:00:00.000Z',
+        timeEnds:     '2016-10-28T11:00:00.000Z'
     }
 };
 
@@ -30,9 +30,9 @@ docClient.put(params, function(err, data) {
 var params = {
     TableName: 'TherapistAvailability',
     Item: {
-        therapistUrn: 'urn:ruuby:therapist:283876728-1',
-        timeStarts:   '2016-10-22T13:00:00.000Z',
-        timeEnds:     '2016-10-22T13:45:00.000Z'
+        therapistUrn: 'urn:ruuby:therapist:315942482-4',
+        timeStarts:   '2016-10-28T13:00:00.000Z',
+        timeEnds:     '2016-10-28T13:45:00.000Z'
     }
 };
 
