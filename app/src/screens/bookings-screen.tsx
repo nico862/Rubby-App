@@ -13,10 +13,12 @@ import {
   TextStyle,
   TouchableHighlight,
   ListView,
-  AppState
+  AppState,
+  ActionSheetIOS
 } from "react-native";
 
 const moment = require("moment");
+
 
 // interface BookingsScreenProps {
 //   navigator: any;
@@ -29,6 +31,7 @@ const moment = require("moment");
 //   session: any;
 //   visible: boolean;
 // }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -73,6 +76,14 @@ const styles = StyleSheet.create({
   } as TextStyle,
 });
 
+const ACTION_SHEET_BUTTONS = [
+  "Log out",
+  "Cancel"
+];
+
+const LOGOUT_INDEX = 0;
+const CANCEL_INDEX = 1;
+
 class BookingsScreen extends React.Component<any, any> {
   loadDataIntervalId: any;
 
@@ -116,7 +127,7 @@ class BookingsScreen extends React.Component<any, any> {
   onNavigatorEvent(event: any) {
     if (event.type === "NavBarButtonPress") {
       if (event.id === "user") {
-        this.props.dispatch(sessionActions.logout());
+        this.showActionSheet();
       }
     }
   }
@@ -280,6 +291,19 @@ class BookingsScreen extends React.Component<any, any> {
           { this.renderUpcoming() }
         </View>
     );
+  }
+
+  showActionSheet() {
+    ActionSheetIOS.showActionSheetWithOptions({
+        options: ACTION_SHEET_BUTTONS,
+        cancelButtonIndex: CANCEL_INDEX,
+        destructiveButtonIndex: LOGOUT_INDEX,
+      },
+      (buttonIndex: number) => {
+        if (ACTION_SHEET_BUTTONS[LOGOUT_INDEX] === ACTION_SHEET_BUTTONS[buttonIndex]) {
+          this.props.dispatch(sessionActions.logout());
+        }
+    });
   }
 }
 
