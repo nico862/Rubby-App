@@ -27,8 +27,8 @@ export interface Hour {
 export interface Booking {
   id: number;
   postcode: string;
-  start: string;
-  end: string;
+  timeStarts: string;
+  timeEnds: string;
   treatments: string[];
 }
 
@@ -192,6 +192,7 @@ class CalendarDayScreen extends React.Component<any, State> {
     if (nextProps.calendar.diary !== this.props.calendar.diary) {
       this.setState({
         hoursData: nextProps.calendar.diary.hours,
+        bookingsData: nextProps.calendar.diary.bookings
       });
     }
 
@@ -202,15 +203,29 @@ class CalendarDayScreen extends React.Component<any, State> {
     this.props.dispatch(calendarActions.toggleHour(this.props.date, hourIndex));
   }
 
+  onBookingPress(booking: any) {
+    this.props.navigator.push({
+      title: "Booking",
+      screen: "RuubyPA.BookingScreen",
+      backButtonTitle: "Back",
+      passProps: {
+        booking: booking
+      }
+    });
+  }
+
   renderHour(hour: Hour, index: number) {
     let containerStyle = styles.rowContainer;
     let seperatorStyle = styles.rowSeperator;
     let note: JSX.Element;
 
     if (hour.isAvailable) {
-      containerStyle = styles.rowContainerAvailable;
 
-      if (!hour.isUpdating) {
+      if (!hour.hasBooking) {
+        containerStyle = styles.rowContainerAvailable;
+      }
+
+      if (!hour.hasBooking && !hour.isUpdating) {
         note = (<Image style={styles.availableIcon} source={require("../../resources/images/calendar/available.png")} />);
       }
     }
@@ -220,7 +235,7 @@ class CalendarDayScreen extends React.Component<any, State> {
     }
 
     // check if this hour or next hour is available
-    if (hour.isAvailable || (this.state.hoursData[index + 1] && this.state.hoursData[index + 1].isAvailable)) {
+    if (!hour.hasBooking && (hour.isAvailable || (this.state.hoursData[index + 1] && this.state.hoursData[index + 1].isAvailable && !this.state.hoursData[index + 1].hasBooking))) {
       seperatorStyle = styles.rowSeperatorAvailable;
     }
 
@@ -253,38 +268,42 @@ class CalendarDayScreen extends React.Component<any, State> {
   }
 
   renderBooking(booking: Booking) {
-    const start = moment(booking.start);
-    const end = moment(booking.end);
+    const start = moment(booking.timeStarts);
+    const end = moment(booking.timeEnds);
 
     // calculate top and height
-    const top = Math.floor((start.hour() - 9) * 51 + (start.minute() / 60) * 51);
-    const bottom = Math.floor((end.hour() - 9) * 51 + (end.minute() / 60) * 51);
+    const top = Math.floor((start.hour()) * 51 + (start.minute() / 60) * 51);
+    const bottom = Math.floor((end.hour()) * 51 + (end.minute() / 60) * 51);
     const minHeight = bottom - top;
 
     const style = {top, minHeight};
 
-    const treatment = (booking.treatments.length > 1)
-      ? `${booking.treatments.length} treatments`
-      : booking.treatments[0];
+
+    const treatment = (booking.bookingTreatments.length > 1)
+      ? `${booking.bookingTreatments.length} treatments`
+      : booking.bookingTreatments[0].treatment.name;
 
     return(
-      <View style={[styles.booking, style]} key={booking.id}>
-        <View style={styles.bookingHeader}>
-          <Text style={[styles.bookingHour, styles.bookingText]}>
-            {start.format("H:mm")} - {end.format("H:mm")}
+      <TouchableHighlight key={booking["@id"]} onPress={() => this.onBookingPress(booking)} underlayColor="#dddddd">
+        <View style={[styles.booking, style]}>
+          <View style={styles.bookingHeader}>
+            <Text style={[styles.bookingHour, styles.bookingText]}>
+              {start.format("H:mm")} - {end.format("H:mm")}
+            </Text>
+            <Text style={styles.bookingText}>{booking.postcode}</Text>
+          </View>
+          <Text style={[styles.bookingTreatment, styles.bookingText]} numberOfLines={1}>
+            {treatment}
           </Text>
-          <Text style={styles.bookingText}>{booking.postcode}</Text>
         </View>
-        <Text style={[styles.bookingTreatment, styles.bookingText]} numberOfLines={1}>
-          {treatment}
-        </Text>
-      </View>
+      </TouchableHighlight>
     );
   }
 
   render() {
     const hours = this.state.hoursData.map(this.renderHour);
     const bookings = this.state.bookingsData.map(this.renderBooking);
+
 
     // start at 8 AM
     const yOffset = 8 * 51;
@@ -299,13 +318,14 @@ class CalendarDayScreen extends React.Component<any, State> {
               {hours}
             </View>
             <View style={styles.bookingsContainer}>
-              {bookings}
+              { bookings}
             </View>
           </ScrollView>
         </View>
     );
   }
 }
+// { bookings}
 
 // which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {
