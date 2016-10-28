@@ -27,7 +27,6 @@ export default function calendar(state: any = initialState, action: any = {}): a
       });
 
     case types.FETCH_DAY_DIARY_SUCCESS:
-      // console.log("action.diary", action.diary);
       return state.merge({
         diary: action.diary,
         diaryIsLoading: false,
