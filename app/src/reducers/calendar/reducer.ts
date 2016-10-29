@@ -1,4 +1,4 @@
-import * as Immutable from "seamless-immutable";
+import * as si from "seamless-immutable";
 
 import * as types from "./action-types";
 
@@ -7,7 +7,7 @@ const emptyDiary: any = {
   hours: [],
 };
 
-const initialState = Immutable({
+const initialState = si.from({
   calendar: [],
   diary: emptyDiary,
 });

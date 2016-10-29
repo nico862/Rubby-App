@@ -20,7 +20,8 @@ export interface Config {
   };
   jwt: {
     tokenSecret: string;
-    expires: number;
+    accessTokenExpires: number;
+    refreshTokenExpires: number;
   };
   dynamoDB?: {
     endpoint?: string;

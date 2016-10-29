@@ -1,8 +1,8 @@
-import * as types from "./action-types";
-import config from "../../config";
-
 import { AsyncStorage } from "react-native";
 import * as reactRedux from "react-redux";
+
+import * as types from "./action-types";
+import * as sessionApi from "../../api/session";
 
 declare const fetch: (url: string, options?: Object) => Promise<any>;
 
@@ -23,27 +23,18 @@ function changeRoot(root: string) {
 
 export function appInitialized() {
   return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
-    console.log("Initializing");
-
-    getStoredToken()
-      .then((tokenData) => {
-        console.log("token: " + tokenData);
-        if (tokenData) {
-          console.log(tokenData);
-          // handle expired data
-          // if (tokenData.expires < moment()) {
-          // }
-
-          if (tokenData && tokenData.access_token) {
-            console.log(tokenData);
-            dispatch(loginSuccess(tokenData));
-            return;
-          }
+    sessionApi.hasAccessToken()
+      .then(result => {
+        if (result) {
+          dispatch(loginSuccess({})); // REPLACE
         }
-
+        else {
+          dispatch(changeRoot("login"));
+        }
+      })
+      .catch(err => {
         dispatch(changeRoot("login"));
       });
-// });
   };
 }
 
@@ -52,43 +43,14 @@ export function login(username: string, password: string) {
     // login logic would go here, and when it"s done, we switch app roots
     dispatch(loginAttempt());
 
-    const postParams = {
-      username,
-      password,
-      grant_type: "password",
-    };
-
-    const body = Object.keys(postParams).map(key => {
-      const encodedKey = encodeURIComponent(key);
-      const encodedValue = encodeURIComponent(postParams[key]);
-      return `${encodedKey}=${encodedValue}`;
-    }).join("&");
-
-    fetch(`${ config.api.host }/oauth/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Basic ${ config.api.clientAuth }`
-      },
-      body,
-    })
-      .then(validateResponse)
-      .then(setStoredToken)
-      .then((data) => {
-        dispatch(loginSuccess(data));
+    sessionApi.logIn(username, password)
+      .then(data => {
+        dispatch(loginSuccess({}));
       })
      .catch(err => {
-       dispatch(loginError(err));
+       dispatch(loginError());
      });
   };
-}
-
-function validateResponse(res: any) {
-  if (!res.ok) {
-    throw new Error("FAIL_LOGIN");
-  }
-
-  return res.json();
 }
 
 function logoutAction() {
@@ -99,36 +61,18 @@ function loginAttempt() {
   return {type: types.LOGIN_ATTEMPT, payload: {}};
 }
 
-function loginSuccess (sessionData: any) {
+function loginSuccess(sessionData: any) {
   return {
     type: types.LOGIN_SUCCESS,
     payload: sessionData
   };
 }
 
-function loginError (err: Error) {
-  let payload: string;
-
-  switch (err.message) {
-    case "FAIL_LOGIN":
-      payload = "Email adddress and password are not recognised";
-  }
+function loginError() {
+  const payload = "Email adddress and password are not recognised";
 
   return {
     type: types.LOGIN_FAIL,
     payload
   };
-}
-
-function getStoredToken() {
-  return AsyncStorage.getItem("apiAccessToken")
-    .then((data) => {
-      return JSON.parse(data);
-    });
-}
-
-function setStoredToken(tokenData: any) {
-  console.log("setting");
-  return AsyncStorage.setItem("apiAccessToken", JSON.stringify(tokenData))
-    .then(() => { return tokenData; });
 }

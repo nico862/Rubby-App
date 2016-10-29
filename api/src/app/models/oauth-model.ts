@@ -7,43 +7,81 @@ import { User } from "../business-objects";
 import { SalonTherapist } from "./therapist-model";
 
 const secretKey = config.jwt.tokenSecret;
-const accessTokenExpiresDuration = moment.duration(config.jwt.expires);
-const refreshTokenExpiresDuration = moment.duration(config.jwt.expires).add(3600, "seconds");
 
 export interface UserSalonTherapist extends SalonTherapist {
   user: User;
 }
 
 export default class OAuthModel {
-  accessTokenLifetime = moment().add(accessTokenExpiresDuration).toDate();
-
   getAccessToken (accessToken: string): any {
-    console.log("in getAccessToken (bearerToken: " + accessToken + ")");
-
     const user = jwt.verify(accessToken, secretKey, {
-        ignoreExpiration: true // handled by OAuth2 server implementation
+        ignoreExpiration: true // handled below
     });
 
-    return {accessToken, user};
+    // expires is in the token and is in epoch seconds
+    // moment requires milliseconds
+    const accessTokenExpiresAt = moment(user.exp * 1000).toDate();
+
+    return {accessToken, user, accessTokenExpiresAt};
   };
+
+  getRefreshToken(refreshToken: string): Promise<any> {
+    return oAuthRefreshTokenService.getToken(refreshToken)
+      .then(data => {
+        const refreshTokenExpiresAt = data.expires.toDate();
+
+        const promises: [Promise<User>, Promise<any>] = [
+          userService.fetchUserByUrn(data.userUrn),
+          oAuthClientService.getClientById(data.clientId)
+        ];
+
+        return Promise.all(promises)
+          .then(results => {
+            const [userOnly, client] = results;
+
+            return mapUserSalonAndTherapist(userOnly)
+              .then(user => {
+                return { refreshTokenExpiresAt, client, user, refreshToken };
+              });
+          });
+      });
+  }
+
+  revokeToken(refreshToken: any): Promise<any> {
+    const expires = moment().subtract(1, "hours");
+
+    return oAuthRefreshTokenService.revokeToken(refreshToken.refreshToken, expires)
+      .then(() => {
+        return {
+          refreshTokenExpiresAt: expires.toDate()
+        };
+      });
+  }
 
   saveAuthorizationCode(authorizationCode: any): any {
     return {authorizationCode};
   }
 
   saveToken (tokenObject: any, client: any, user: UserSalonTherapist): any {
+    // get expiry time as seconds
+    const expiresIn = moment(tokenObject.accessTokenExpiresAt).diff(moment(), "seconds");
+
     // Use JWT for access tokens
-    const accessToken = jwt.sign(user, secretKey, {
-      expiresIn: accessTokenExpiresDuration.asSeconds(),
-    });
+    const accessToken = jwt.sign(user, secretKey, {expiresIn});
 
     // save refresh token
-    return oAuthRefreshTokenService.saveToken(tokenObject.refreshToken, client.id, user.user.urn, moment().add(refreshTokenExpiresDuration))
+    return oAuthRefreshTokenService.saveToken(
+      tokenObject.refreshToken,
+      client.id,
+      user.user.urn,
+      moment(tokenObject.refreshTokenExpiresAt)
+    )
       .then(() => {
         return {
-          accessToken: accessToken,
-          accessTokenExpiresAt: this.accessTokenLifetime,
+          accessToken,
+          accessTokenExpiresAt: tokenObject.accessTokenExpiresAt,
           refreshToken: tokenObject.refreshToken,
+          refreshTokenExpiresAt: tokenObject.refreshTokenExpiresAt,
           client,
           user
         };
@@ -54,23 +92,18 @@ export default class OAuthModel {
     return true;
   }
 
-  getClient (clientId: string, clientSecret: string): Promise<any> {
-    console.log("in getClient (clientId: " + clientId +
-                ", clientSecret: " + clientSecret + ")");
-
-    return oAuthClientService.getClient(clientId, clientSecret)
+  getClient (id: string, clientSecret: string): Promise<any> {
+    return oAuthClientService.getClientById(id, clientSecret)
       .then(client => {
         return {
-          grants: ["authorization_code", "password"]
+          id,
+          grants: ["authorization_code", "password", "refresh_token"]
         };
       })
       .catch(console.log);
   };
 
   getUser (username: string, password: string): Promise<UserSalonTherapist> {
-    console.log("in getUser (username: " + username +
-                ", password: " + password + ")");
-
     return userService.findUserByEmailAndPassword(username, password)
       .then(mapUserSalonAndTherapist)
       .catch(console.log);

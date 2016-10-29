@@ -4,7 +4,6 @@ import "moment-timezone";
 import * as httpStatus from "http-status";
 
 import * as calendarModel from "../models/calendar-model";
-import * as httpUtils from "../utils/http";
 import config from "../config";
 
 export function showCalendar(req: express.Request, res: express.Response, next: express.NextFunction): void {
@@ -18,12 +17,8 @@ export function showCalendar(req: express.Request, res: express.Response, next: 
 export function getDayAvailability(req: express.Request, res: express.Response, next: express.NextFunction): void {
   const therapistUrn = res.locals.oauth.token.user.therapist["@id"];
   const date = moment.tz(req.params.date, config.timezone);
-  const reqParams: httpUtils.RequestParams = {
-    protocol: req.protocol,
-    host: req.get("host"),
-  };
 
-  calendarModel.getAvailabilityForTherapistForDay(reqParams, therapistUrn, date)
+  calendarModel.getAvailabilityForTherapistForDay(therapistUrn, date)
     .then(data => res.json(data))
     .catch(next);
 }
@@ -35,7 +30,7 @@ export function insertDayAvailability(req: express.Request, res: express.Respons
   calendarModel.createAvailability(therapistUrn, params)
     .then(availability => {
       res.status(httpStatus.CREATED);
-      res.location(httpUtils.location(req, `/availability/${availability.urn}`));
+      res.location(`/availability/${ availability.urn }`);
       res.end();
     })
     .catch(next);

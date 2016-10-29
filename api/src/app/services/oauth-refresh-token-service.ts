@@ -1,6 +1,5 @@
 import * as AWS from "aws-sdk";
 import * as moment from "moment";
-import * as oauthServer from "oauth2-server";
 
 import * as dynamoDb from "../utils/dynamodb-access";
 import { ResourceNotFound } from "../errors";
@@ -9,7 +8,7 @@ const REFRESH_TOKEN_NOT_FOUND = "REFRESH_TOKEN_NOT_FOUND";
 
 const table = "RuubyPAOauthRefreshTokens";
 
-function getToken(token: string): Promise<oauthServer.RefreshToken> {
+function getToken(token: string): Promise<any> {
   const params: AWS.DynamoDB.GetParam = {
     TableName: table,
     Key: {
@@ -24,26 +23,46 @@ function getToken(token: string): Promise<oauthServer.RefreshToken> {
       }
 
       return {
-        clientId: data.clientUrn,
-        userId: data.userUrn,
-        expires: moment(data.expires).toDate()
+        clientId: data.clientId,
+        userUrn: data.userUrn,
+        expires: moment(data.expires)
       };
     });
 }
 
-function saveToken(token: string, clientUrn: string, userUrn: string, expires: moment.Moment): Promise<boolean> {
+function saveToken(token: string, clientId: string, userUrn: string, expires: moment.Moment): Promise<boolean> {
   const params: AWS.DynamoDB.PutParam = {
     TableName: table,
     Item: {
       id: token,
-      clientUrn,
+      clientId,
       userUrn,
       expires: expires.toISOString(),
     }
   };
 
   return dynamoDb.put(params)
-    .then((data) => {
+    .then(data => {
+      return true;
+    });
+}
+
+function revokeToken(token: string, expires: moment.Moment) {
+  const params: AWS.DynamoDB.UpdateParam = {
+    TableName: table,
+    Key: {
+      id: token,
+    },
+    AttributeUpdates: {
+      expires: {
+        Action: "PUT",
+        Value: expires.toISOString(),
+      }
+    },
+  };
+
+  return dynamoDb.deleteItem(params)
+    .then(data => {
       return true;
     });
 }
@@ -51,5 +70,6 @@ function saveToken(token: string, clientUrn: string, userUrn: string, expires: m
 export default {
   getToken,
   saveToken,
+  revokeToken,
   REFRESH_TOKEN_NOT_FOUND
 };

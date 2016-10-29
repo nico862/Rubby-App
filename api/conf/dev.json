@@ -22,7 +22,8 @@
   },
   "jwt": {
     "tokenSecret": "foo",
-    "expires": "P2D"
+    "accessTokenExpires": "PT30M",
+    "refreshTokenExpires": "P2M"
   },
   "calendar": {
     "daysAhead": 31

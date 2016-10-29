@@ -8,7 +8,6 @@ import { bookingService, availabilityService } from "../services";
 import * as bookingsModel from "./bookings-model";
 import { Booking, Availability } from "../business-objects";
 import { mapRowToAvailability } from "../services/model-helper";
-import * as httpUtils from "../utils/http";
 import config from "../config";
 
 export interface Day {
@@ -90,7 +89,7 @@ export interface BookingAvailability {
   hours: AvailabilityHour[];
 }
 
-export function getAvailabilityForTherapistForDay(req: httpUtils.RequestParams, therapistUrn: string, start: moment.Moment): Promise<BookingAvailability> {
+export function getAvailabilityForTherapistForDay(therapistUrn: string, start: moment.Moment): Promise<BookingAvailability> {
   const end = start.clone().endOf("day");
 
   return Promise.all([
@@ -100,7 +99,7 @@ export function getAvailabilityForTherapistForDay(req: httpUtils.RequestParams, 
     .then(data => {
       const [availability, bookings] = data;
 
-      const hours = annotateAvailability(req, start, availability, bookings);
+      const hours = annotateAvailability(start, availability, bookings);
 
       if (bookings.length === 0) {
         return {hours, bookings: []} as BookingAvailability;
@@ -113,7 +112,7 @@ export function getAvailabilityForTherapistForDay(req: httpUtils.RequestParams, 
     });
 }
 
-function annotateAvailability(req: httpUtils.RequestParams, start: moment.Moment, availability: Availability[], bookings: Booking[]): AvailabilityHour[] {
+function annotateAvailability(start: moment.Moment, availability: Availability[], bookings: Booking[]): AvailabilityHour[] {
   return _.range(0, 24).map(hour => {
     const hourStart = start.clone().add(hour, "hour");
     const hourEnd = hourStart.clone().endOf("hour");
@@ -134,7 +133,7 @@ function annotateAvailability(req: httpUtils.RequestParams, start: moment.Moment
     const data: AvailabilityHour = {hour, isAvailable, hasBooking};
 
     if (isAvailable) {
-      data.location = httpUtils.location(req, `/availability/${hourAvailability[0].urn}`);
+      data.location = `/availability/${ hourAvailability[0].urn }`;
     }
 
     return data;

@@ -1,4 +1,5 @@
 import * as express from "express";
+import * as moment from "moment";
 
 import * as bookingsController from "./controllers/bookings-controller";
 import * as calendarController from "./controllers/calendar-controller";
@@ -37,8 +38,8 @@ export function configure(app: express.Application) {
 
   app["oauth"] = new OAuthServer({
     model: oauthModel,
-    debug: true,
-    accessTokenLifetime: oauthModel.accessTokenLifetime
+    accessTokenLifetime: moment.duration(config.jwt.accessTokenExpires).asSeconds(),
+    refreshTokenLifetime: moment.duration(config.jwt.refreshTokenExpires).asSeconds(),
   });
 
   // Handle token grant requests

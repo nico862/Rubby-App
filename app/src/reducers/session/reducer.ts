@@ -1,8 +1,8 @@
-import * as Immutable from "seamless-immutable";
+import * as si from "seamless-immutable";
 
 import * as types from "./action-types";
 
-const initialState = Immutable({
+const initialState = si.from({
   rootLayout: "wait"
 });
 

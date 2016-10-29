@@ -1,5 +1,4 @@
 import * as AWS from "aws-sdk";
-import * as oauthServer from "oauth2-server";
 import * as bcrypt from "bcrypt";
 
 import * as dynamoDb from "../utils/dynamodb-access";
@@ -9,25 +8,29 @@ const CLIENT_NOT_FOUND = "CLIENT_NOT_FOUND";
 
 const table = "RuubyPAOauthClients";
 
-function getClient(clientUrn: string, clientSecret: string): Promise<oauthServer.Client> {
+function getClientById(clientId: string, clientSecret?: string): Promise<any> {
   const params: AWS.DynamoDB.GetParam = {
     TableName: table,
     Key: {
-      id: clientUrn
+      id: clientId
     }
   };
 
   return dynamoDb.get(params)
-    .then((data) => {
+    .then(data => {
       if (!data) {
         throw new ResourceNotFound(CLIENT_NOT_FOUND);
+      }
+
+      if (!clientSecret) {
+        return {id: data["id"]};
       }
 
       return new Promise((resolve, reject) => {
         bcrypt.compare(clientSecret, data.secret, (err, res) => {
           if (res) {
             resolve({
-              clientId: data.id,
+              id: data["id"],
             });
           }
           else {
@@ -39,6 +42,6 @@ function getClient(clientUrn: string, clientSecret: string): Promise<oauthServer
 }
 
 export default {
-  getClient,
+  getClientById,
   CLIENT_NOT_FOUND
 };

@@ -3,22 +3,16 @@ import * as moment from "moment";
 import "moment-timezone";
 
 import * as types from "./action-types";
+import * as calendarApi from "../../api/calendar";
 import config from "../../config";
 
 declare const fetch: (url: string, options?: Object) => Promise<any>;
 
-export function fetchCalendar(): (dispatch: reactRedux.Dispatch<any>, getState: any) => void  {
-  return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
-    const token = getState().session.token.access_token;
+export function fetchCalendar(): (dispatch: reactRedux.Dispatch<any>) => void  {
+  return (dispatch: reactRedux.Dispatch<any>) => {
     dispatch(fetchCalendarAttempt());
 
-    fetch(`${ config.api.host }/calendar`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
+    calendarApi.getCalendar()
       .then(data => dispatch(fetchCalendarSuccess(data)))
       .catch(err => dispatch(fetchCalendarFail(err)));
   };
@@ -36,18 +30,11 @@ function fetchCalendarFail(err: Error) {
   return {type: types.FETCH_CALENDAR_FAIL};
 }
 
-export function fetchDayDiary(date: string): (dispatch: reactRedux.Dispatch<any>, getState: any) => void {
-  return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
-    const token = getState().session.token.access_token;
+export function fetchDayDiary(date: string): (dispatch: reactRedux.Dispatch<any>) => void {
+  return (dispatch: reactRedux.Dispatch<any>) => {
     dispatch(fetchDayDiaryAttempt());
 
-    fetch(`${ config.api.host }/calendar/${ date }`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
+    calendarApi.getCalendarDay(date)
       .then(data => dispatch(fetchDayDiarySuccess(data)))
       .catch(err => dispatch(fetchDayDiaryFail(err)));
   };
@@ -67,7 +54,6 @@ function fetchDayDiaryFail(err: Error) {
 
 export function toggleHour(dateString: string, hourIndex: number): (dispatch: reactRedux.Dispatch<any>, getState: any) => void  {
   return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
-    const token = getState().session.token.access_token;
     const hours = getState().calendar.diary.hours;
     const selectedHour = hours[hourIndex];
 
@@ -76,32 +62,14 @@ export function toggleHour(dateString: string, hourIndex: number): (dispatch: re
     if (!hours[hourIndex].isAvailable) {
       dispatch(setHourAvailable(hourIndex));
 
-      const body = JSON.stringify({
-        timeStarts,
-        timeEnds: timeStarts.clone().endOf("hour"),
-      });
-
-      fetch(`${ config.api.host }/availability`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body,
-      })
-        .then(validateResponse)
+      calendarApi.setHourAvailable(timeStarts)
         .then(setHourAvailabilityLocation.bind(null, hourIndex, dispatch))
         .catch(console.log);
     }
     else {
       dispatch(setHourUnavailable(hourIndex));
 
-      fetch(selectedHour.location, {
-        method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        },
-      })
+      calendarApi.setHourUnavailable(selectedHour.location)
         .then(validateResponse)
         .then(unsetHourAvailabilityLocation.bind(null, hourIndex, dispatch))
         .catch(console.log);
