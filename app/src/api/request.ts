@@ -1,5 +1,6 @@
 import * as httpStatus from "http-status";
 import * as _ from "lodash";
+import * as semver from "semver";
 
 import * as tokenStorage from "./token-storage";
 import config from "../config";
@@ -9,6 +10,7 @@ declare const fetch: (urlOrRequest: string | any, options?: any) => Promise<any>
 
 const REQUEST_TOKEN_EXPIRED =  "token-expired";
 const REQUEST_ERROR = "unknown-error";
+export const REQUEST_APP_VERSION_UPGRADE = "require-upgrade";
 
 const tokenExpired = new RegExp("access token has expired");
 
@@ -80,7 +82,11 @@ export default class ApiRequest {
   }
 
   private _validateResponse(res: any): any {
-    console.log(res);
+    if (semver.lt(config.appVersion, res.headers.get("X-Min-App-Version"))) {
+      // app version is not recent enough for the server API
+      throw new Error(REQUEST_APP_VERSION_UPGRADE);
+    }
+
     if (res.ok) {
       return res;
     }

@@ -1,0 +1,10 @@
+{
+  "api": {
+    "host":  "https://app-api.ruuby.com/ruuby-pa",
+    "clientAuth": "cnV1YnlQQU1vYmlsZUFwcDplOGEzNjNhNS01OTY5LTRiOTMtOTJlZS0xNWVjNWU2M2NhMTM"
+  },
+  "timezone": "Europe/London",
+  "timerIntervals": {
+    "bookings": 300000
+  }
+}

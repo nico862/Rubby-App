@@ -32,6 +32,7 @@ export interface Config {
   timezone: string;
   baseUrlPath: string;
   pathToRoot: string;
+  minAppVersion: string;
 }
 
 let confFile = "../../conf/dev.json";

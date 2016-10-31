@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as moment from "moment";
-import config from "../config";
 
 import {
   Text,

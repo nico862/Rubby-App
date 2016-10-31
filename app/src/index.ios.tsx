@@ -35,6 +35,18 @@ class App {
     switch (layout) {
       case "wait":
         console.log("Waiting for app to start up");
+        return;
+
+      case "upgrade":
+        Navigation.startSingleScreenApp({
+          screen: {
+            screen: "RuubyPA.UpgradeScreen",
+            title: "Upgrade",
+            navigatorStyle: {}
+          },
+        });
+
+        return;
 
       case "login":
         Navigation.startSingleScreenApp({

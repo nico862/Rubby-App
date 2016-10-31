@@ -4,6 +4,7 @@ import BookingsScreen from "./bookings-screen";
 import BookingScreen from "./booking-screen";
 import CalendarScreen from "./calendar-screen";
 import CalendarDayScreen from "./calendar-day-screen";
+import UpgradeScreen from "./upgrade-screen";
 import LoginScreen from "./login-screen";
 
 
@@ -12,6 +13,7 @@ export function registerScreens(store: Redux.Store<any>, Provider: typeof ReactR
   Navigation.registerComponent("RuubyPA.BookingsScreen", () => BookingsScreen, store, Provider);
   Navigation.registerComponent("RuubyPA.BookingScreen", () => BookingScreen, store, Provider);
   Navigation.registerComponent("RuubyPA.CalendarScreen", () => CalendarScreen, store, Provider);
- Navigation.registerComponent("RuubyPA.CalendarDayScreen", () => CalendarDayScreen, store, Provider);
+  Navigation.registerComponent("RuubyPA.CalendarDayScreen", () => CalendarDayScreen, store, Provider);
   Navigation.registerComponent("RuubyPA.LoginScreen", () => LoginScreen, store, Provider);
+  Navigation.registerComponent("RuubyPA.UpgradeScreen", () => UpgradeScreen, store, Provider);
 }

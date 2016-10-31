@@ -19,6 +19,8 @@ export interface OAuthApp extends express.Application {
  * @param {express.Application} app An Express app
  */
 export function configure(app: express.Application) {
+  const packageInfo = require(`${config.pathToRoot}package.json`);
+
   app.use(function (req, res, next) {
     // Website you wish to allow to connect
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,7 +28,9 @@ export function configure(app: express.Application) {
     // Request methods you wish to allow
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
 
-    // Pass to next layer of middleware
+    res.setHeader("X-Version", packageInfo.version);
+    res.setHeader("X-Min-App-Version", config.minAppVersion);
+
     next();
   });
 
@@ -65,7 +69,6 @@ export function configure(app: express.Application) {
   router.route("/availability/:availabilityUrn")
     .delete(app["oauth"].authenticate(), calendarController.deleteDayAvailability);
 
-  const packageInfo = require(`${config.pathToRoot}package.json`);
   router.route("/status")
     .get((req, res) => {
       res.json({

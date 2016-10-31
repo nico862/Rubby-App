@@ -30,6 +30,7 @@ export interface Booking {
   timeStarts: string;
   timeEnds: string;
   treatments: string[];
+  bookingTreatments: any[];
 }
 
 const styles = StyleSheet.create({

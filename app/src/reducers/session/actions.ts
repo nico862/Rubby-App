@@ -3,6 +3,7 @@ import * as reactRedux from "react-redux";
 
 import * as types from "./action-types";
 import * as sessionApi from "../../api/session";
+import {REQUEST_APP_VERSION_UPGRADE} from "../../api/request";
 
 declare const fetch: (url: string, options?: Object) => Promise<any>;
 
@@ -48,13 +49,24 @@ export function login(username: string, password: string) {
         dispatch(loginSuccess({}));
       })
      .catch(err => {
-       dispatch(loginError());
+       console.log(err);
+        switch (err.message) {
+          case REQUEST_APP_VERSION_UPGRADE:
+            dispatch(promptUpgradeAction());
+
+          default:
+            dispatch(loginError());
+        }
      });
   };
 }
 
-function logoutAction() {
+export function logoutAction() {
   return {type: types.ROOT_CHANGED, payload: "login"};
+}
+
+export function promptUpgradeAction() {
+  return {type: types.ROOT_CHANGED, payload: "upgrade"};
 }
 
 function loginAttempt() {

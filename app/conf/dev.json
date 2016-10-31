@@ -1,0 +1,10 @@
+{
+  "api": {
+    "host": "http://localhost:8080/ruuby-pa",
+    "clientAuth": "cnV1YnlQQU1vYmlsZUFwcDo2NDY4ZGQ1Yy04NTkwLTExZTYtYWUyMi01NmI2YjY0OTk2MTE="
+  },
+  "timezone": "Europe/London",
+  "timerIntervals": {
+    "bookings": 300000
+  }
+}
