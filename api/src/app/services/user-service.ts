@@ -10,7 +10,7 @@ const USER_NOT_FOUND = "USER_NOT_FOUND";
 function findUserByEmailAndPassword(email: string, password: string): Promise<User> {
   const query = squel.select(db.squelSelectOptions)
     .from("members")
-    .where("member_email = ? AND member_passwd = ?", email, password);
+    .where("member_email = ? AND member_passwd = ? AND is_ruuby_pa_enabled = true", email, password);
 
   return db.doSelect(query).then((rows) => {
     if (rows.length === 0) {

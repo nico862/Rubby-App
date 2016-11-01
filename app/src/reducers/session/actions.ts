@@ -1,90 +1,60 @@
-import { AsyncStorage } from "react-native";
-import * as reactRedux from "react-redux";
+import {Dispatch} from "react-redux";
 
 import * as types from "./action-types";
 import * as sessionApi from "../../api/session";
-import {REQUEST_APP_VERSION_UPGRADE} from "../../api/request";
+import {handleApiError} from "../util";
 
 declare const fetch: (url: string, options?: Object) => Promise<any>;
 
-export function logout() {
-  return (dispatch: reactRedux.Dispatch<any>, getState: any): void => {
-      console.log("logging out");
-      AsyncStorage.removeItem("apiAccessToken")
-        .then( () => dispatch(logoutAction()) );
-  };
-}
-
-function changeRoot(root: string) {
-  return {
-    type: types.ROOT_CHANGED,
-    payload: root
-  };
-}
-
-export function appInitialized() {
-  return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
+export function initialiseApp() {
+  return (dispatch: Dispatch<any>, getState: any): void => {
     sessionApi.hasAccessToken()
       .then(result => {
         if (result) {
-          dispatch(loginSuccess({})); // REPLACE
+          dispatch(logInSuccess());
         }
         else {
-          dispatch(changeRoot("login"));
+          dispatch(logOutAction());
         }
       })
       .catch(err => {
-        dispatch(changeRoot("login"));
+        dispatch(logOutAction());
       });
   };
 }
 
 export function login(username: string, password: string) {
-  return (dispatch: reactRedux.Dispatch<any>, getState: any) => {
+  return (dispatch: Dispatch<any>, getState: any): void => {
     // login logic would go here, and when it"s done, we switch app roots
     dispatch(loginAttempt());
 
     sessionApi.logIn(username, password)
-      .then(data => {
-        dispatch(loginSuccess({}));
+      .then(() => {
+        dispatch(logInSuccess());
       })
-     .catch(err => {
-       console.log(err);
-        switch (err.message) {
-          case REQUEST_APP_VERSION_UPGRADE:
-            dispatch(promptUpgradeAction());
-
-          default:
-            dispatch(loginError());
-        }
-     });
+      .catch(handleApiError.bind(null, dispatch, loginError));
   };
 }
 
-export function logoutAction() {
-  return {type: types.ROOT_CHANGED, payload: "login"};
+export function logout() {
+  return (dispatch: Dispatch<any>, getState: any): void => {
+    sessionApi.removeAccessTokens()
+      .then( () => dispatch(logOutAction()) );
+  };
 }
 
-export function promptUpgradeAction() {
-  return {type: types.ROOT_CHANGED, payload: "upgrade"};
+export function logOutAction() {
+  return {type: types.LOG_OUT, payload: {}};
 }
 
 function loginAttempt() {
-  return {type: types.LOGIN_ATTEMPT, payload: {}};
+  return {type: types.LOG_IN_ATTEMPT, payload: {}};
 }
 
-function loginSuccess(sessionData: any) {
-  return {
-    type: types.LOGIN_SUCCESS,
-    payload: sessionData
-  };
+function logInSuccess() {
+  return {type: types.LOG_IN_SUCCESS, payload: {}};
 }
 
 function loginError() {
-  const payload = "Email adddress and password are not recognised";
-
-  return {
-    type: types.LOGIN_FAIL,
-    payload
-  };
+  return {type: types.LOG_IN_FAIL, payload: {}};
 }

@@ -13,3 +13,7 @@ export function hasAccessToken(): Promise<boolean> {
       return (tokenData && tokenData.accessToken !== undefined);
     });
 }
+
+export function removeAccessTokens(): Promise<string> {
+  return tokenStorage.removeTokens();
+}

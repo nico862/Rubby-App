@@ -33,14 +33,15 @@ export function getCalendarForTherapist(therapistUrn: string): Promise<Month[]> 
 
 function getDates(start: moment.Moment, end: moment.Moment, bookings: Booking[]): Month[] {
   // create a date map of bookings
+  debugger;
   const bookingsMap = {};
   bookings.forEach(booking => { bookingsMap[ booking.timeStarts.format("YYYY-MM-DD") ] = true; });
 
-  const month = start.clone().subtract(start.date() - 1, "days");
+  const month = start.clone().startOf("month");
 
   const dates: Month[] = [];
 
-  while (month.month() <= end.month()) {
+  while (month.isBefore(end.clone().startOf("month"))) {
     const monthCalendar = new calendar.Calendar().monthdatescalendar(month.year(), month.month() + 1);
 
     const weeksInRange = monthCalendar.filter(week => {

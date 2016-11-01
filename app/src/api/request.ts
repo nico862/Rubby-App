@@ -8,11 +8,13 @@ import formUrlencoded = require("form-urlencoded");
 
 declare const fetch: (urlOrRequest: string | any, options?: any) => Promise<any>;
 
-const REQUEST_TOKEN_EXPIRED =  "token-expired";
-const REQUEST_ERROR = "unknown-error";
+export const REQUEST_ERROR = "unknown-error";
 export const REQUEST_APP_VERSION_UPGRADE = "require-upgrade";
+export const REQUEST_ACCESS_TOKEN_EXPIRED = "access-token-expired";
+export const REQUEST_REFRESH_TOKEN_EXPIRED = "refresh-token-expired";
 
-const tokenExpired = new RegExp("access token has expired");
+const accessTokenExpired = new RegExp("access token has expired");
+const refreshTokenExpired = "REFRESH_TOKEN_NOT_FOUND";
 
 export default class ApiRequest {
   constructor(private path?: string, private options?: any) {}
@@ -24,10 +26,11 @@ export default class ApiRequest {
       .then(this._validateResponse)
       .catch((err: Error) => {
         switch (err.message) {
-          case REQUEST_TOKEN_EXPIRED:
+          case REQUEST_ACCESS_TOKEN_EXPIRED:
             return this.authenticateRefreshToken()
               .then(this._authenticatedRequest.bind(this))
-              .then(this._validateResponse);
+              .then(this._validateResponse)
+              .catch(err => { console.log("HERE " + err.message); throw err; });
 
           default:
             throw err;
@@ -92,8 +95,16 @@ export default class ApiRequest {
     }
     else if (res.status === httpStatus.UNAUTHORIZED) {
       return res.json().then((data: any) => {
-        if (data["error"] === "invalid_token" && data["error_description"].match(tokenExpired)) {
-          throw new Error(REQUEST_TOKEN_EXPIRED);
+        if (data["error"] === "invalid_token" && data["error_description"].match(accessTokenExpired)) {
+          throw new Error(REQUEST_ACCESS_TOKEN_EXPIRED);
+        }
+      });
+    }
+    else if (res.status === httpStatus.SERVICE_UNAVAILABLE) {
+      console.log("Service unavailable");
+      return res.json().then((data: any) => {
+        if (data["error"] === "server_error" && data["error_description"] === refreshTokenExpired) {
+          throw new Error(REQUEST_REFRESH_TOKEN_EXPIRED);
         }
       });
     }

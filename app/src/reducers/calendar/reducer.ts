@@ -39,31 +39,35 @@ export default function calendar(state: any = initialState, action: any = {}): a
       });
 
     case types.SET_HOUR_AVAILABLE:
-      return setHourIndexProperty(state, action.payload.hourIndex, "isAvailable", true);
+      return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "isAvailable"], true);
 
     case types.SET_HOUR_UNAVAILABLE:
-      return setHourIndexProperty(state, action.payload.hourIndex, "isAvailable", false);
+      return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "isAvailable"], false);
 
     case types.SET_HOUR_UPDATING:
-      return setHourIndexProperty(state, action.payload.hourIndex, "isUpdating", true);
+      return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "isUpdating"], true)
+        .setIn(["diary", "hours", action.payload.hourIndex, "hasErrored"], false);
 
     case types.SET_HOUR_UPDATED:
-      return setHourIndexProperty(state, action.payload.hourIndex, "isUpdating", false);
+      return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "isUpdating"], false);
+
+    case types.SET_HOUR_UPDATE_FAIL:
+      return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "hasErrored"], true);
 
     case types.SET_HOUR_LOCATION:
-      return setHourIndexProperty(state, action.payload.hourIndex, "location", action.payload.location);
+      return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "location"], action.payload.location);
 
     case types.UNSET_HOUR_LOCATION:
-      return setHourIndexProperty(state, action.payload.hourIndex, "location", undefined);
+      return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "location"], null);
 
     default:
       return state;
   }
-}
-
-function setHourIndexProperty(state: any, index: number, property: string, value: any) {
-  return state.setIn(
-    ["diary", "hours", index, property],
-    value
-  );
 }

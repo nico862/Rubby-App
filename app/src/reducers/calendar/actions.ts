@@ -4,6 +4,7 @@ import "moment-timezone";
 
 import * as types from "./action-types";
 import * as calendarApi from "../../api/calendar";
+import {handleApiError} from "../util";
 import config from "../../config";
 
 declare const fetch: (url: string, options?: Object) => Promise<any>;
@@ -14,21 +15,10 @@ export function fetchCalendar(): (dispatch: reactRedux.Dispatch<any>) => void  {
 
     calendarApi.getCalendar()
       .then(data => dispatch(fetchCalendarSuccess(data)))
-      .catch(err => dispatch(fetchCalendarFail(err)));
+      .catch(handleApiError.bind(null, dispatch, fetchCalendarFail));
   };
 }
 
-function fetchCalendarAttempt() {
-  return {type: types.FETCH_CALENDAR_ATTEMPT};
-}
-
-function fetchCalendarSuccess(calendar: any) {
-  return {type: types.FETCH_CALENDAR_SUCCESS, calendar};
-}
-
-function fetchCalendarFail(err: Error) {
-  return {type: types.FETCH_CALENDAR_FAIL};
-}
 
 export function fetchDayDiary(date: string): (dispatch: reactRedux.Dispatch<any>) => void {
   return (dispatch: reactRedux.Dispatch<any>) => {
@@ -36,20 +26,8 @@ export function fetchDayDiary(date: string): (dispatch: reactRedux.Dispatch<any>
 
     calendarApi.getCalendarDay(date)
       .then(data => dispatch(fetchDayDiarySuccess(data)))
-      .catch(err => dispatch(fetchDayDiaryFail(err)));
+      .catch(handleApiError.bind(null, dispatch, fetchDayDiaryFail));
   };
-}
-
-function fetchDayDiaryAttempt() {
-  return {type: types.FETCH_DAY_DIARY_ATTEMPT};
-}
-
-function fetchDayDiarySuccess(diary: any) {
-  return {type: types.FETCH_DAY_DIARY_SUCCESS, diary};
-}
-
-function fetchDayDiaryFail(err: Error) {
-  return {type: types.FETCH_DAY_DIARY_FAIL};
 }
 
 export function toggleHour(dateString: string, hourIndex: number): (dispatch: reactRedux.Dispatch<any>, getState: any) => void  {
@@ -64,7 +42,7 @@ export function toggleHour(dateString: string, hourIndex: number): (dispatch: re
 
       calendarApi.setHourAvailable(timeStarts)
         .then(setHourAvailabilityLocation.bind(null, hourIndex, dispatch))
-        .catch(console.log);
+        .catch(handleApiError.bind(null, dispatch, updateHourAvailabilityFail.bind(null, hourIndex)));
     }
     else {
       dispatch(setHourUnavailable(hourIndex));
@@ -72,7 +50,7 @@ export function toggleHour(dateString: string, hourIndex: number): (dispatch: re
       calendarApi.setHourUnavailable(selectedHour.location)
         .then(validateResponse)
         .then(unsetHourAvailabilityLocation.bind(null, hourIndex, dispatch))
-        .catch(console.log);
+        .catch(handleApiError.bind(null, dispatch, updateHourAvailabilityFail.bind(null, hourIndex)));
     }
 
     dispatch(setHourUpdating(hourIndex));
@@ -95,6 +73,34 @@ function validateResponse(res: any) {
   }
 
   return res;
+}
+
+function fetchDayDiaryAttempt() {
+  return {type: types.FETCH_DAY_DIARY_ATTEMPT};
+}
+
+function fetchDayDiarySuccess(diary: any) {
+  return {type: types.FETCH_DAY_DIARY_SUCCESS, diary};
+}
+
+function fetchDayDiaryFail(err: Error) {
+  return {type: types.FETCH_DAY_DIARY_FAIL};
+}
+
+function fetchCalendarAttempt() {
+  return {type: types.FETCH_CALENDAR_ATTEMPT};
+}
+
+function fetchCalendarSuccess(calendar: any) {
+  return {type: types.FETCH_CALENDAR_SUCCESS, calendar};
+}
+
+function fetchCalendarFail(err: Error) {
+  return {type: types.FETCH_CALENDAR_FAIL};
+}
+
+function updateHourAvailabilityFail(hourIndex: number) {
+  return {type: types.SET_HOUR_UPDATE_FAIL, payload: {hourIndex}};
 }
 
 function setHourAvailable(hourIndex: number) {

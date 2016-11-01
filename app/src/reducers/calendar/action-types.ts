@@ -12,3 +12,4 @@ export const SET_HOUR_LOCATION = "RuubyPA.calendar.SET_HOUR_LOCATION";
 export const SET_HOUR_UNAVAILABLE = "RuubyPA.calendar.SET_HOUR_UNAVAILABLE";
 export const SET_HOUR_UPDATING = "RuubyPA.calendar.SET_HOUR_UPDATING";
 export const SET_HOUR_UPDATED = "RuubyPA.calendar.SET_HOUR_UPDATED";
+export const SET_HOUR_UPDATE_FAIL = "RuubyPA.calendar.SET_HOUR_UPDATE_FAIL";

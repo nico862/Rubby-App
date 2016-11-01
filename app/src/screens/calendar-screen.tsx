@@ -202,12 +202,12 @@ class CalendarScreen extends React.Component<any, any> {
       let circleTextStyle: TextStyle;
       let clickable = false;
 
-      if (day.isDisabled) {
+      if (day.notInMonth) {
         return(
           <View style={styles.emptyDay} key={day.date}></View>
         );
       }
-      else if (day.notInMonth) {
+      else if (day.isDisabled) {
         circleStyle = styles.circleOutOfMonth;
         circleTextStyle = styles.circleTextOutOfMonth;
       }

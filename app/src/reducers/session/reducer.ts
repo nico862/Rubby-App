@@ -8,31 +8,36 @@ const initialState = si.from({
 
 export default function app(state: any = initialState, action: any = {}): any {
   switch (action.type) {
-    case types.LOGIN_ATTEMPT:
+    case types.LOG_IN_ATTEMPT:
       return state.merge({
         isLoggingIn: true,
         error: null,
       });
 
-    case types.LOGIN_SUCCESS:
+    case types.LOG_IN_SUCCESS:
       return state.merge({
         rootLayout: "main",
         isLoggingIn: false,
-        token: action.payload,
         isAuthenticated: true,
         error: null,
       });
 
-    case types.LOGIN_FAIL:
+    case types.LOG_IN_FAIL:
       return state.merge({
         isLoggingIn: false,
-        error: action.payload,
+        error: "Email adddress and password are not recognised",
       });
 
-    case types.ROOT_CHANGED:
+    case types.LOG_OUT:
       return state.merge({
-        rootLayout: action.payload,
-        isAuthenticated: false
+        rootLayout: "login",
+        isAuthenticated: false,
+      });
+
+    case types.REQUIRE_UPGRADE:
+      return state.merge({
+        rootLayout: "upgrade",
+        isAuthenticated: false,
       });
 
     default:

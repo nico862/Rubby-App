@@ -1,5 +1,7 @@
 import { AsyncStorage } from "react-native";
 
+const TOKEN_STORAGE_KEY = "apiAccessToken";
+
 export interface RawTokenData {
   access_token: string;
   refresh_token: string;
@@ -13,10 +15,14 @@ export interface TokenData {
 }
 
 export function getTokens(): Promise<TokenData> {
-  return AsyncStorage.getItem("apiAccessToken")
+  return AsyncStorage.getItem(TOKEN_STORAGE_KEY)
     .then(data => {
       return JSON.parse(data);
     });
+}
+
+export function removeTokens(): Promise<string> {
+  return AsyncStorage.removeItem(TOKEN_STORAGE_KEY);
 }
 
 export function storeTokens(rawTokenData: RawTokenData): Promise<boolean> {
@@ -26,6 +32,6 @@ export function storeTokens(rawTokenData: RawTokenData): Promise<boolean> {
     refreshToken: rawTokenData.refresh_token
   };
 
-  return AsyncStorage.setItem("apiAccessToken", JSON.stringify(tokenData))
+  return AsyncStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(tokenData))
     .then(() => { return true; });
 }

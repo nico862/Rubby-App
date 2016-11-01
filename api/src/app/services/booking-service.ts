@@ -2,6 +2,7 @@ import * as axios from "axios";
 import * as url from "url";
 import * as moment from "moment";
 
+import {logger} from "../logger";
 import config from "../config";
 import { Booking, BookingParams } from "../business-objects";
 
@@ -21,6 +22,8 @@ function fetchBookingsForTherapist(therapistUrn: string, options?: BookingSearch
         reqUrl.query.overlaps = `${options.start.toISOString()} TO ${options.end.toISOString()}`;
       }
     }
+
+    logger.debug(`Fetching URL: ${url.format(reqUrl)}`);
 
     axios.get(url.format(reqUrl))
       .then(function (response: any) {

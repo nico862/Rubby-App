@@ -10,19 +10,21 @@ import {
   ImageStyle,
   Image,
   TouchableOpacity,
-  StatusBar,
   Animated,
+  Linking,
+  ActivityIndicator,
 } from "react-native";
 import {connect} from "react-redux";
 
 import * as sessionActions from "../reducers/session/actions";
 
+const SIZE_RATIO = 1.14;
 const windowSize = Dimensions.get("window");
+
 const styles = StyleSheet.create({
     container: {
       flexDirection: "column",
       flex: 1,
-      backgroundColor: "transparent"
     } as TextStyle,
     bg: {
         position: "absolute",
@@ -31,14 +33,14 @@ const styles = StyleSheet.create({
         width: windowSize.width,
         height: windowSize.height
     } as ImageStyle,
-    // bgTint: {
-    //     position: "absolute",
-    //     left: 0,
-    //     top: 0,
-    //     width: windowSize.width,
-    //     height: windowSize.height,
-    //     backgroundColor: "rgba(116, 109, 108, 0.55)"
-    // } as TextStyle,
+    bgTint: {
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: windowSize.width,
+        height: windowSize.height,
+        backgroundColor: "rgba(251, 236, 233, 0.7)"
+    } as ViewStyle,
     header: {
         justifyContent: "center",
         alignItems: "center",
@@ -46,9 +48,9 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent"
     } as TextStyle,
     logo: {
-        width: 200,
-        height: 84,
-        tintColor: "white"
+        width: 200 * SIZE_RATIO,
+        height: 84 * SIZE_RATIO,
+        tintColor: "black"
     },
     signin: {
         backgroundColor: "black",
@@ -67,33 +69,40 @@ const styles = StyleSheet.create({
         padding: 10,
         borderWidth: 1,
         height: 41,
-        borderBottomColor: "#CCC",
-        borderColor: "transparent"
+        borderBottomColor: "rgba(0, 0, 0, 0.7)",
+        borderColor: "transparent",
     },
     input: {
-        position: "absolute",
-        left: 61,
-        top: 12,
-        right: 0,
-        height: 20,
-        fontSize: 14
+      position: "absolute",
+      left: 61,
+      top: 12,
+      right: 0,
+      height: 20,
+      fontSize: SIZE_RATIO * 14
     },
     forgotContainer: {
       alignItems: "flex-end",
       padding: 15,
-    } as TextStyle,
+      backgroundColor: "transparent"
+    } as ViewStyle,
     greyFont: {
-      color: "#D8D8D8"
+      color: "black",
+      fontSize: SIZE_RATIO * 14
     },
     whiteFont: {
-      color: "#FFF"
+      color: "black",
+      fontSize: SIZE_RATIO * 14
+    },
+    signinText: {
+      color: "white",
+      fontSize: SIZE_RATIO * 16
     },
     pinkFont: {
-      color: "#fbece9"
+      color: "#fbece9",
+      fontSize: SIZE_RATIO * 14
     },
     signinButtonContainer: {
       height: 85,
-      // flexShrink: 0,
     } as ViewStyle,
     errorContainer: {
       position: "relative",
@@ -105,14 +114,14 @@ const styles = StyleSheet.create({
       right: 0,
       padding: 5,
       height: 30,
-      backgroundColor: "red",
+      backgroundColor: "rgba(255, 0 , 0, 0.7)",
       position: "absolute",
       alignItems: "center",
       justifyContent: "center",
     } as ViewStyle,
     errorText: {
       color: "white",
-      fontSize: 12,
+      fontSize: 12 * SIZE_RATIO,
     } as TextStyle
 });
 
@@ -121,6 +130,7 @@ interface LoginScreenState {
   password?: string;
   error?: string;
   errorBoxBounceValue?: Animated.Value;
+  isLoggingIn?: boolean;
 }
 
 class LoginScreen extends React.Component<any, LoginScreenState> {
@@ -136,10 +146,6 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
       password: "",
       error: null,
     };
-  }
-
-  componentWillUnmount() {
-    console.log("Component-Lifecycle", "componentWillUnmount", "LoginScreen");
   }
 
   componentWillReceiveProps(nextProps: any) {
@@ -158,7 +164,8 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
 
       this.setState({
         errorBoxBounceValue,
-        error: nextProps.session.error
+        error: nextProps.session.error,
+        isLoggingIn: nextProps.session.isLoggingIn,
       });
     }
   }
@@ -179,6 +186,10 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
     }
   }
 
+  onForgotPasswordPress() {
+    Linking.openURL("http://ruubysalon.com/forgot-your-password");
+  }
+
   errorField() {
     if (this.state.error) {
       const errorStyle = {
@@ -195,15 +206,33 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
     return null;
   }
 
+  signInButton() {
+    if (this.state.isLoggingIn) {
+      return (
+        <View style={styles.signin}>
+            <ActivityIndicator animating={true} size={"large"}></ActivityIndicator>
+        </View>
+      );
+    }
+    else {
+      return (
+        <TouchableOpacity
+          style={styles.signin}
+          onPress={ this.onLoginPress.bind(this) }>
+            <Text style={styles.signinText}>Sign In</Text>
+        </TouchableOpacity>
+      );
+    }
+  }
+
   render() {
     const error = this.errorField();
+    const signInButton = this.signInButton();
 
     return (
           <View style={styles.container}>
-             <StatusBar
-               barStyle="light-content"
-             />
-            <Image style={styles.bg} source={require("../../resources/images/login/background.png")} />
+            <Image style={styles.bg} source={require("../../resources/images/login/background/375x667.jpg")} />
+            <View style={styles.bgTint}></View>
             <View style={styles.header}>
                 <Image style={styles.logo} source={require("../../resources/images/logo.png")} />
             </View>
@@ -212,7 +241,8 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
                     <TextInput
                         style={[styles.input, styles.whiteFont]}
                         placeholder="Email"
-                        placeholderTextColor="rgba(255,255,255,0.5)"
+                        autoCorrect={false}
+                        placeholderTextColor="rgba(0, 0, 0, 0.5)"
                         onChange={this.onUsernameTextChanged.bind(this)}
                         value={this.state.username}
                         keyboardType="email-address"
@@ -227,27 +257,27 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
                     <TextInput
                         ref="passwordInput"
                         password={true}
+                        autoCorrect={false}
                         style={[styles.input, styles.whiteFont]}
                         placeholder="Password"
-                        placeholderTextColor="rgba(255,255,255,0.5)"
+                        placeholderTextColor="rgba(0, 0, 0, 0.5)"
                         onChange={this.onPasswordTextChanged.bind(this)}
                         value={this.state.password}
                         returnKeyType={"go"}
+                        onSubmitEditing={this.onLoginPress.bind(this)}
                     />
                 </View>
                 <View style={styles.forgotContainer}>
-                    <Text style={styles.greyFont}>Forgot Password</Text>
+                  <TouchableOpacity onPress={ this.onForgotPasswordPress.bind(this) }>
+                    <Text style={styles.greyFont}>Forgot Password?</Text>
+                  </TouchableOpacity>
                 </View>
             </View>
             <View style={styles.signinButtonContainer}>
               <View style={styles.errorContainer}>
                 {error}
               </View>
-              <TouchableOpacity
-                style={styles.signin}
-                onPress={ this.onLoginPress.bind(this) }>
-                  <Text style={styles.pinkFont}>Sign In</Text>
-              </TouchableOpacity>
+              {signInButton}
             </View>
             <View style={styles.footer}>
             </View>

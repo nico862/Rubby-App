@@ -12,7 +12,7 @@ export interface Config {
 
 let config: Config;
 if (__DEV__) {
-  config = require("../conf/prod.json");
+  config = require("../conf/dev.json");
 }
 else {
   config = require("../conf/prod.json");

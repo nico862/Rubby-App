@@ -19,7 +19,7 @@ class App {
   constructor() {
     // since react-redux only works on components, we need to subscribe this class manually
     store.subscribe(this.onStoreUpdate.bind(this));
-    store.dispatch(sessionActions.appInitialized());
+    store.dispatch(sessionActions.initialiseApp());
   }
 
   onStoreUpdate() {
@@ -66,7 +66,7 @@ class App {
               screen: "RuubyPA.BookingsScreen",
               icon: require("../resources/images/buttons/bookings.png"),
               selectedIcon: require("../resources/images/buttons/bookings.png"),
-              title: "Bookings tab",
+              title: "Bookings",
               overrideBackPress: true,
             },
             {
