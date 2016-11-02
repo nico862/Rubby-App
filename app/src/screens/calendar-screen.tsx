@@ -5,8 +5,6 @@ import * as React from "react";
 import {connect} from "react-redux";
 import config from "../config";
 
-import Spinner from "react-native-loading-spinner-overlay";
-
 import {
   Text,
   TouchableHighlight,

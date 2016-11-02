@@ -20,12 +20,6 @@ export default function calendar(state: any = initialState, action: any = {}): a
         diaryIsLoading: false,
       });
 
-    case types.FETCH_CALENDAR_ATTEMPT:
-      return state.merge({
-        calendar: [],
-        loading: true,
-      });
-
     case types.FETCH_DAY_DIARY_ATTEMPT:
       return state.merge({
         diary: emptyDiary,
