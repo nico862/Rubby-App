@@ -5,7 +5,7 @@
   },
   "timezone": "Europe/London",
   "timerIntervals": {
-    "bookings": 30000,
-    "calendar": 5000
+    "bookings": 300000,
+    "calendar": 300000
   }
 }
