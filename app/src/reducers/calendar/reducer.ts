@@ -26,16 +26,25 @@ export default function calendar(state: any = initialState, action: any = {}): a
         loading: true,
       });
 
-    case types.FETCH_DAY_DIARY_SUCCESS:
-      return state.merge({
-        diary: action.diary,
-        diaryIsLoading: false,
-      });
-
     case types.FETCH_DAY_DIARY_ATTEMPT:
       return state.merge({
         diary: emptyDiary,
         diaryIsLoading: true,
+        diaryLoadError: false,
+      });
+
+    case types.FETCH_DAY_DIARY_SUCCESS:
+      return state.merge({
+        diary: action.diary,
+        diaryIsLoading: false,
+        diaryLoadError: false,
+      });
+
+    case types.FETCH_DAY_DIARY_FAIL:
+      return state.merge({
+        diary: emptyDiary,
+        diaryIsLoading: false,
+        diaryLoadError: true,
       });
 
     case types.SET_HOUR_AVAILABLE:
