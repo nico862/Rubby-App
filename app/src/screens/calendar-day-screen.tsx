@@ -2,7 +2,7 @@ import * as calendarActions from "../reducers/calendar/actions";
 
 import * as React from "react";
 import {connect} from "react-redux";
-import Spinner from "react-native-loading-spinner-overlay";
+
 import {
   Text,
   TouchableHighlight,
@@ -12,6 +12,8 @@ import {
   StyleSheet,
   TextStyle,
   ViewStyle,
+  ImageStyle,
+  ActivityIndicator
 } from "react-native";
 
 const moment = require("moment");
@@ -156,13 +158,30 @@ const styles = StyleSheet.create({
     color: "rgba(0, 0, 0, 0.3)",
     fontSize: 11,
     right: 10,
-  } as TextStyle
+  } as TextStyle,
+
+  feedbackContainer: {
+    marginTop: 20,
+    alignItems: "center"
+  } as ViewStyle,
+
+  apiFailIcon: {
+    width: 64,
+    height: 64,
+    tintColor: "#666"
+  } as ImageStyle,
+
+  feedbackText: {
+    color: "#666",
+    fontSize: 14,
+  }
 });
 
 interface State {
   hoursData?: Hour[];
   bookingsData?: Booking[];
   diaryIsLoading?: boolean;
+  diaryLoadError?: boolean;
 }
 
 class CalendarDayScreen extends React.Component<any, State> {
@@ -177,6 +196,7 @@ class CalendarDayScreen extends React.Component<any, State> {
       hoursData: [],
       bookingsData: [],
       diaryIsLoading: false,
+      diaryLoadError: false,
     };
 
     this.renderHour = this.renderHour.bind(this);
@@ -197,6 +217,7 @@ class CalendarDayScreen extends React.Component<any, State> {
       });
     }
 
+    this.setState({diaryLoadError: nextProps.calendar.diaryLoadError});
     this.setState({diaryIsLoading: nextProps.calendar.diaryIsLoading});
   }
 
@@ -302,17 +323,34 @@ class CalendarDayScreen extends React.Component<any, State> {
   }
 
   render() {
-    const hours = this.state.hoursData.map(this.renderHour);
-    const bookings = this.state.bookingsData.map(this.renderBooking);
+    let content: JSX.Element;
 
+    if (this.state.diaryIsLoading) {
+      content = (
+        <View style={styles.feedbackContainer}>
+          <ActivityIndicator animating={true} size={"large"}></ActivityIndicator>
+        </View>
+      );
+    }
+    else if (this.state.diaryLoadError) {
+      content = (
+        <View style={styles.feedbackContainer}>
+          <Image style={styles.apiFailIcon} source={require("../../resources/images/sad.png")} />
+          <View style={styles.feedbackContainer}>
+            <Text style={styles.feedbackText}>Sorry! I could not load your diary.</Text>
+            <Text style={styles.feedbackText}>Please try again.</Text>
+          </View>
+        </View>
+      );
+    }
+    else {
+      // start at 8 AM
+      const yOffset = 8 * 51;
 
-    // start at 8 AM
-    const yOffset = 8 * 51;
+      const hours = this.state.hoursData.map(this.renderHour);
+      const bookings = this.state.bookingsData.map(this.renderBooking);
 
-    return (
-        <View style={styles.container}>
-          <Spinner visible={this.state.diaryIsLoading} />
-
+      content = (
           <ScrollView
             contentOffset={{y: yOffset, x: 0}}>
             <View>
@@ -322,6 +360,12 @@ class CalendarDayScreen extends React.Component<any, State> {
               { bookings}
             </View>
           </ScrollView>
+        );
+    }
+
+    return (
+        <View style={styles.container}>
+          {content}
         </View>
     );
   }

@@ -3,7 +3,6 @@ import * as calendarActions from "../reducers/calendar/actions";
 
 import * as React from "react";
 import {connect} from "react-redux";
-import Spinner from "react-native-loading-spinner-overlay";
 import {
   Text,
   TouchableHighlight,
@@ -257,8 +256,6 @@ class CalendarScreen extends React.Component<any, any> {
   render() {
     return (
         <View style={styles.container}>
-          <Spinner visible={this.state.bookingsAreLoading} />
-
           {this.renderCalendar()}
         </View>
     );
