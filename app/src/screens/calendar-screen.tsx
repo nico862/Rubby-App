@@ -3,6 +3,8 @@ import * as calendarActions from "../reducers/calendar/actions";
 
 import * as React from "react";
 import {connect} from "react-redux";
+import config from "../config";
+
 import {
   Text,
   TouchableHighlight,
@@ -10,6 +12,7 @@ import {
   StyleSheet,
   TextStyle,
   ViewStyle,
+  AppState,
   ActionSheetIOS
 } from "react-native";
 
@@ -123,15 +126,39 @@ class CalendarScreen extends React.Component<any, any> {
     this.state = {
       selectedIndex: 1,
       calendarData: [],
-      calendarLoading: false
+      calendarLoading: false,
+      loadDataIntervalId: null
     };
 
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    this._handleAppStateChange = this._handleAppStateChange.bind(this);
 
     this.renderMonth = this.renderMonth.bind(this);
     this.renderWeek = this.renderWeek.bind(this);
     this.onDayPress = this.onDayPress.bind(this);
   }
+
+  _handleAppStateChange(currentAppState: string) {
+    if (currentAppState === "active") {
+      this._loadData();
+      this._startDataInterval();
+    } else if (currentAppState === "inactive") {
+      clearInterval(this.state.loadDataIntervalId);
+    }
+  }
+
+  _startDataInterval() {
+    clearInterval(this.state.loadDataIntervalId); // clears this to be safe
+    const loadDataIntervalId = setInterval(this._loadData.bind(this), config.timerIntervals.calendar);
+    this.setState({ loadDataIntervalId });
+  }
+
+  _loadData() {
+    if (this.props.session.isAuthenticated) {
+      this.props.dispatch(calendarActions.fetchCalendar());
+    }
+  }
+
 
   onNavigatorEvent(event: any) {
     if (event.type === "NavBarButtonPress") {
@@ -142,9 +169,14 @@ class CalendarScreen extends React.Component<any, any> {
   }
 
   componentDidMount() {
-    if (this.props.session.isAuthenticated) {
-      this.props.dispatch(calendarActions.fetchCalendar());
-    }
+    AppState.addEventListener("change", this._handleAppStateChange);
+    this._loadData();
+    this._startDataInterval();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.loadDataIntervalId);
+    AppState.removeEventListener("change", this._handleAppStateChange);
   }
 
   componentWillReceiveProps(nextProps: any) {

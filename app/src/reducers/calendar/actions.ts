@@ -11,7 +11,6 @@ declare const fetch: (url: string, options?: Object) => Promise<any>;
 
 export function fetchCalendar(): (dispatch: reactRedux.Dispatch<any>) => void  {
   return (dispatch: reactRedux.Dispatch<any>) => {
-    dispatch(fetchCalendarAttempt());
 
     calendarApi.getCalendar()
       .then(data => dispatch(fetchCalendarSuccess(data)))
@@ -85,10 +84,6 @@ function fetchDayDiarySuccess(diary: any) {
 
 function fetchDayDiaryFail(err: Error) {
   return {type: types.FETCH_DAY_DIARY_FAIL};
-}
-
-function fetchCalendarAttempt() {
-  return {type: types.FETCH_CALENDAR_ATTEMPT};
 }
 
 function fetchCalendarSuccess(calendar: any) {
