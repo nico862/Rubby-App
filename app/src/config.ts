@@ -6,6 +6,7 @@ export interface Config {
   timezone: string;
   timerIntervals: {
     bookings: number;
+    calendar: number;
   };
   appVersion: string;
 }

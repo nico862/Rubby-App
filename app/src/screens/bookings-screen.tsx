@@ -85,7 +85,6 @@ const LOGOUT_INDEX = 0;
 const CANCEL_INDEX = 1;
 
 class BookingsScreen extends React.Component<any, any> {
-  loadDataIntervalId: any;
 
   static navigatorStyle = {
     navBarBackgroundColor: "#fbece9",
@@ -116,7 +115,8 @@ class BookingsScreen extends React.Component<any, any> {
       selectedIndex: 1,
       completedBookings,
       upcomingBookings,
-      bookingsAreLoading: false
+      bookingsAreLoading: false,
+      loadDataIntervalId: null
     };
 
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -137,13 +137,14 @@ class BookingsScreen extends React.Component<any, any> {
       this._loadData();
       this._startDataInterval();
     } else if (currentAppState === "inactive") {
-      clearInterval(this.loadDataIntervalId);
+      clearInterval(this.state.loadDataIntervalId);
     }
   }
 
   _startDataInterval() {
-    clearInterval(this.loadDataIntervalId); // clears this to be safe
-    this.loadDataIntervalId = setInterval(this._loadData.bind(this), config.timerIntervals.bookings);
+    clearInterval(this.state.loadDataIntervalId); // clears this to be safe
+    const loadDataIntervalId = setInterval(this._loadData.bind(this), config.timerIntervals.bookings);
+    this.setState({ loadDataIntervalId });
   }
 
   _loadData() {
@@ -153,7 +154,7 @@ class BookingsScreen extends React.Component<any, any> {
   }
 
   componentWillUnmount() {
-    clearInterval(this.loadDataIntervalId);
+    clearInterval(this.state.loadDataIntervalId);
     AppState.removeEventListener("change", this._handleAppStateChange);
   }
 
