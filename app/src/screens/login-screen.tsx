@@ -18,8 +18,8 @@ import {connect} from "react-redux";
 
 import * as sessionActions from "../reducers/session/actions";
 
-const SIZE_RATIO = 1.14;
 const windowSize = Dimensions.get("window");
+const SIZE_RATIO = windowSize.width >= 375 ? 1.14 : 1;
 
 const styles = StyleSheet.create({
     container: {

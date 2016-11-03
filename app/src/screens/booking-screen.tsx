@@ -9,9 +9,12 @@ import {
   TextStyle,
   ViewStyle,
   TouchableHighlight,
-  Linking
+  Linking,
+  Dimensions
 } from "react-native";
 
+const windowSize = Dimensions.get("window");
+const SIZE_RATIO = windowSize.width >= 375 ? 1.14 : 1;
 
 export interface BookingScreenProps {
   navigator: any;
@@ -28,14 +31,17 @@ const styles = StyleSheet.create({
     padding: 10,
   } as TextStyle,
   time: {
-    fontSize: 16,
+    fontSize: 16 * SIZE_RATIO,
     fontWeight: "bold"
+  } as TextStyle,
+  bodyText: {
+    fontSize: 14 * SIZE_RATIO,
   } as TextStyle,
   fieldContainer: {
     marginBottom: 15,
   } as ViewStyle,
   fieldHeading: {
-    fontSize: 11,
+    fontSize: 11 * SIZE_RATIO,
     color: "#666666"
   } as TextStyle,
   headingContainer: {
@@ -48,9 +54,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   } as ViewStyle,
   treatmentPrice: {
+    fontSize: 14 * SIZE_RATIO,
   } as TextStyle,
   treatmentName: {
     flex: 1,
+    fontSize: 14 * SIZE_RATIO,
   } as TextStyle,
   directionsContainer: {
     backgroundColor: "black",
@@ -61,6 +69,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   } as ViewStyle,
   directionsText: {
+    fontSize: 14 * SIZE_RATIO,
     color: "white"
   } as TextStyle
 });
@@ -100,12 +109,17 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
       return;
     }
 
+    let address2: JSX.Element;
+    if (booking.address.address2) {
+      address2 = (<Text style={styles.bodyText}>{booking.address.address2}</Text>);
+    }
+
     return (
       <View style={styles.fieldContainer}>
         <View style={styles.headingContainer}><Text style={styles.fieldHeading}>ADDRESS</Text></View>
-        <Text>{booking.address.address1}</Text>
-        <Text>{booking.address.address2}</Text>
-        <Text>{booking.address.postcode}</Text>
+        <Text style={styles.bodyText}>{booking.address.address1}</Text>
+        {address2}
+        <Text style={styles.bodyText}>{booking.address.postcode}</Text>
       </View>
     );
   }
@@ -118,7 +132,7 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
     return (
       <View style={styles.fieldContainer}>
         <View style={styles.headingContainer}><Text style={styles.fieldHeading}>NOTES</Text></View>
-        <Text>{booking.notes || "N\\A"}</Text>
+        <Text style={styles.bodyText}>{booking.notes || "N/A"}</Text>
       </View>
     );
   }
@@ -156,7 +170,7 @@ export default class BookingScreen extends React.Component<BookingScreenProps, B
             <Text style={styles.time}>{moment(booking.timeStarts).format("ddd D MMM, HH:mm")}</Text>
           </View>
           <View style={styles.fieldContainer}>
-            <Text>{customer.firstName} {customer.lastName}</Text>
+            <Text style={styles.bodyText}>{customer.firstName} {customer.lastName}</Text>
           </View>
           <View style={styles.fieldContainer}>
             { treatmentsSection }

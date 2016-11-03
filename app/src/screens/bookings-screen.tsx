@@ -4,6 +4,7 @@ import * as sessionActions from "../reducers/session/actions";
 import * as React from "react";
 import {connect} from "react-redux";
 import config from "../config";
+import moment = require("moment");
 
 import { SegmentedControls } from "react-native-radio-buttons";
 import {
@@ -14,24 +15,12 @@ import {
   TouchableHighlight,
   ListView,
   AppState,
-  ActionSheetIOS
+  ActionSheetIOS,
+  Dimensions
 } from "react-native";
 
-const moment = require("moment");
-
-
-// interface BookingsScreenProps {
-//   navigator: any;
-// }
-
-// interface BookingsScreenState {
-//   selectedIndex?: number;
-//   completedBookings?: ListViewDataSource;
-//   upcomingBookings?: ListViewDataSource;
-//   session: any;
-//   visible: boolean;
-// }
-
+const windowSize = Dimensions.get("window");
+const SIZE_RATIO = windowSize.width >= 375 ? 1.14 : 1;
 
 const styles = StyleSheet.create({
   container: {
@@ -46,17 +35,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#dddddd"
   } as TextStyle,
   time: {
-    fontSize: 16,
+    fontSize: 16 * SIZE_RATIO,
     color: "black",
     fontWeight: "bold"
   } as TextStyle,
   treatment: {
-    fontSize: 14,
+    fontSize: 14 * SIZE_RATIO,
     color: "black",
     marginTop: 2,
   } as TextStyle,
   customer: {
-    fontSize: 14,
+    fontSize: 14 * SIZE_RATIO,
     color: "black",
     marginTop: 2,
   } as TextStyle,
@@ -72,7 +61,7 @@ const styles = StyleSheet.create({
   },
   noBookings: {
     textAlign: "center",
-    color: "#666666"
+    color: "#666"
   } as TextStyle,
 });
 
@@ -191,7 +180,7 @@ class BookingsScreen extends React.Component<any, any> {
     const treatments = booking.bookingTreatments.map((bookingTreatment: any) => {
       return (
         <Text style={styles.treatment} key={bookingTreatment["@id"]}
-          numberOfLines={1}>{bookingTreatment.treatment.name} - {bookingTreatment.treatment.durationMinutes} mins</Text>
+          numberOfLines={1}>{bookingTreatment.treatment.name}</Text>
       );
     });
 
@@ -285,8 +274,6 @@ class BookingsScreen extends React.Component<any, any> {
               containerBorderTint={"black"}
             />
           </View>
-
-
 
           { this.renderCompleted() }
           { this.renderUpcoming() }

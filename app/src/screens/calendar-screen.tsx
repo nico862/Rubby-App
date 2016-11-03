@@ -76,9 +76,16 @@ const styles = StyleSheet.create({
   },
 
   circleHasBookings: Object.assign({}, circleStyle, {
-    backgroundColor: "#fbece9",
+    backgroundColor: "#ddd8d8",
    }) as ViewStyle,
   circleTextHasBookings: {
+    color: "black"
+  },
+
+  circleIsAvailable: Object.assign({}, circleStyle, {
+    backgroundColor: "#fbece9",
+   }) as ViewStyle,
+  circleTextIsAvailable: {
     color: "black"
   },
 
@@ -248,6 +255,10 @@ class CalendarScreen extends React.Component<any, any> {
         if (day.hasBookings) {
           circleStyle = styles.circleHasBookings;
           circleTextStyle = styles.circleTextHasBookings;
+        }
+        else if (day.isAvailable) {
+          circleStyle = styles.circleIsAvailable;
+          circleTextStyle = styles.circleTextIsAvailable;
         }
         else {
           circleStyle = styles.circle;
