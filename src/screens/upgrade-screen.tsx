@@ -7,10 +7,8 @@ import {
   TextStyle,
   ViewStyle,
   ImageStyle,
-  Image,
-  StatusBar
+  Image
 } from "react-native";
-import {connect} from "react-redux";
 
 const windowSize = Dimensions.get("window");
 const styles = StyleSheet.create({
@@ -28,6 +26,14 @@ const styles = StyleSheet.create({
         width: windowSize.width,
         height: windowSize.height
     } as ImageStyle,
+    bgTint: {
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: windowSize.width,
+        height: windowSize.height,
+        backgroundColor: "rgba(251, 236, 233, 0.7)"
+    } as ViewStyle,
     upgradeContainer: {
       justifyContent: "center",
       alignItems: "center"
@@ -35,19 +41,19 @@ const styles = StyleSheet.create({
     appStoreIcon: {
         width: 98,
         height: 98,
-        tintColor: "white"
+        tintColor: "#666"
     } as ImageStyle,
     upgradeTextContainer: {
       width: 210,
     } as ViewStyle,
     upgradeText: {
-      color: "white",
+      color: "#666",
       marginTop: 10,
       textAlign: "center"
     } as TextStyle
 });
 
-export class LoginScreen extends React.Component<any, {}> {
+export default class UpgradeScreen extends React.Component<any, {}> {
   static navigatorStyle = {
     navBarHidden: true
   };
@@ -55,10 +61,8 @@ export class LoginScreen extends React.Component<any, {}> {
   render() {
     return (
           <View style={styles.container}>
-             <StatusBar
-               barStyle="light-content"
-             />
-            <Image style={styles.bg} source={require("../../resources/images/login/background.png")} />
+            <Image style={styles.bg} source={require("../../resources/images/login/background/375x667.jpg")} />
+            <View style={styles.bgTint}></View>
             <View style={styles.upgradeContainer}>
               <Image style={styles.appStoreIcon} source={require("../../resources/images/app-store.png")} />
               <View style={styles.upgradeTextContainer}>
@@ -72,12 +76,3 @@ export class LoginScreen extends React.Component<any, {}> {
     );
   }
 }
-
-// which props do we want to inject, given the global state?
-function mapStateToProps(state: any) {
-  return {
-    session: state.session
-  };
-}
-
-export default connect((mapStateToProps))(LoginScreen);

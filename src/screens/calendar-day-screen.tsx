@@ -1,8 +1,4 @@
-import * as calendarActions from "../reducers/calendar/actions";
-
 import * as React from "react";
-import {connect} from "react-redux";
-
 import {
   Text,
   TouchableHighlight,
@@ -15,8 +11,12 @@ import {
   ImageStyle,
   ActivityIndicator
 } from "react-native";
+import {connect, Dispatch} from "react-redux";
+import {bindActionCreators} from "redux";
+import moment = require("moment");
 
-const moment = require("moment");
+import * as calendarDayActions from "../reducers/calendar-day/actions";
+import * as screenTypes from "./screen-types";
 
 export interface Hour {
   hour: number;
@@ -177,58 +177,42 @@ const styles = StyleSheet.create({
   }
 });
 
-interface State {
-  hoursData?: Hour[];
-  bookingsData?: Booking[];
-  diaryIsLoading?: boolean;
-  diaryLoadError?: boolean;
+interface CalendarDayScreenProps {
+  date: string;
+  isLoading: boolean;
+  loadError: boolean;
+  isAuthenticated: boolean;
+  hours: Hour[];
+  bookings: Booking[];
+  navigator: any;
+  fetchDayDiary: (date: string) => any;
+  toggleHour: (date: string, hourIndex: number) => void;
 }
 
-class CalendarDayScreen extends React.Component<any, State> {
+class CalendarDayScreen extends React.Component<CalendarDayScreenProps, {}> {
   saveButtonHidden = true;
 
   constructor(props: any) {
     super(props);
-
-    // // checkNextAvailable(hours);
-
-    this.state = {
-      hoursData: [],
-      bookingsData: [],
-      diaryIsLoading: false,
-      diaryLoadError: false,
-    };
 
     this.renderHour = this.renderHour.bind(this);
     this.renderBooking = this.renderBooking.bind(this);
   }
 
   componentDidMount() {
-    if (this.props.session.isAuthenticated) {
-      this.props.dispatch(calendarActions.fetchDayDiary(this.props.date));
+    if (this.props.isAuthenticated) {
+      this.props.fetchDayDiary(this.props.date);
     }
-  }
-
-  componentWillReceiveProps(nextProps: any) {
-    if (nextProps.calendar.diary !== this.props.calendar.diary) {
-      this.setState({
-        hoursData: nextProps.calendar.diary.hours,
-        bookingsData: nextProps.calendar.diary.bookings
-      });
-    }
-
-    this.setState({diaryLoadError: nextProps.calendar.diaryLoadError});
-    this.setState({diaryIsLoading: nextProps.calendar.diaryIsLoading});
   }
 
   onHourPress(hourIndex: number) {
-    this.props.dispatch(calendarActions.toggleHour(this.props.date, hourIndex));
+    this.props.toggleHour(this.props.date, hourIndex);
   }
 
   onBookingPress(booking: any) {
     this.props.navigator.push({
       title: "Booking",
-      screen: "RuubyPA.BookingScreen",
+      screen: screenTypes.SCREEN_BOOKING,
       backButtonTitle: "Back",
       passProps: {
         booking: booking
@@ -242,7 +226,6 @@ class CalendarDayScreen extends React.Component<any, State> {
     let note: JSX.Element;
 
     if (hour.isAvailable) {
-
       if (!hour.hasBooking) {
         containerStyle = styles.rowContainerAvailable;
       }
@@ -257,7 +240,7 @@ class CalendarDayScreen extends React.Component<any, State> {
     }
 
     // check if this hour or next hour is available
-    if (!hour.hasBooking && (hour.isAvailable || (this.state.hoursData[index + 1] && this.state.hoursData[index + 1].isAvailable && !this.state.hoursData[index + 1].hasBooking))) {
+    if (!hour.hasBooking && (hour.isAvailable || (this.props.hours[index + 1] && this.props.hours[index + 1].isAvailable && !this.props.hours[index + 1].hasBooking))) {
       seperatorStyle = styles.rowSeperatorAvailable;
     }
 
@@ -300,7 +283,6 @@ class CalendarDayScreen extends React.Component<any, State> {
 
     const style = {top, minHeight};
 
-
     const treatment = (booking.bookingTreatments.length > 1)
       ? `${booking.bookingTreatments.length} treatments`
       : booking.bookingTreatments[0].treatment.name;
@@ -325,14 +307,14 @@ class CalendarDayScreen extends React.Component<any, State> {
   render() {
     let content: JSX.Element;
 
-    if (this.state.diaryIsLoading) {
+    if (this.props.isLoading) {
       content = (
         <View style={styles.feedbackContainer}>
           <ActivityIndicator animating={true} size={"large"}></ActivityIndicator>
         </View>
       );
     }
-    else if (this.state.diaryLoadError) {
+    else if (this.props.loadError) {
       content = (
         <View style={styles.feedbackContainer}>
           <Image style={styles.apiFailIcon} source={require("../../resources/images/sad.png")} />
@@ -347,8 +329,8 @@ class CalendarDayScreen extends React.Component<any, State> {
       // start at 8 AM
       const yOffset = 8 * 51;
 
-      const hours = this.state.hoursData.map(this.renderHour);
-      const bookings = this.state.bookingsData.map(this.renderBooking);
+      const hours = this.props.hours.map(this.renderHour);
+      const bookings = this.props.bookings.map(this.renderBooking);
 
       content = (
           <ScrollView
@@ -370,14 +352,21 @@ class CalendarDayScreen extends React.Component<any, State> {
     );
   }
 }
-// { bookings}
 
-// which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {
   return {
-    session: state.session,
-    calendar: state.calendar,
+    isAuthenticated: state.session.isAuthenticated,
+    isLoading: state.calendarDay.isLoading,
+    hours: state.calendarDay.diary.hours,
+    bookings: state.calendarDay.diary.bookings
   };
 }
 
-export default connect(mapStateToProps)(CalendarDayScreen);
+function mapDispatchToProps(dispatch: Dispatch<any>) {
+  return bindActionCreators({
+    fetchDayDiary: calendarDayActions.fetchDayDiary,
+    toggleHour: calendarDayActions.toggleHour,
+  }, dispatch) as any;
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CalendarDayScreen);

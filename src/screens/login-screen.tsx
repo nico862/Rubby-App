@@ -12,9 +12,10 @@ import {
   TouchableOpacity,
   Animated,
   Linking,
-  ActivityIndicator,
+  ActivityIndicator
 } from "react-native";
-import {connect} from "react-redux";
+import {connect, Dispatch} from "react-redux";
+import {bindActionCreators} from "redux";
 
 import * as sessionActions from "../reducers/session/actions";
 
@@ -125,31 +126,34 @@ const styles = StyleSheet.create({
     } as TextStyle
 });
 
+interface LoginScreenProps {
+  error: string;
+  isLoggingIn: boolean;
+  logIn: (username: string, password: string) => any;
+}
+
 interface LoginScreenState {
   username?: string;
   password?: string;
-  error?: string;
   errorBoxBounceValue?: Animated.Value;
-  isLoggingIn?: boolean;
 }
 
-class LoginScreen extends React.Component<any, LoginScreenState> {
+class LoginScreen extends React.Component<LoginScreenProps, LoginScreenState> {
   static navigatorStyle = {
     navBarHidden: true
   };
 
-  constructor(props: any) {
+  constructor(props: LoginScreenProps) {
     super(props);
 
     this.state = {
       username: "",
       password: "",
-      error: null,
     };
   }
 
-  componentWillReceiveProps(nextProps: any) {
-    if (nextProps.session.error !== this.props.session.error) {
+  componentWillReceiveProps(nextProps: LoginScreenProps) {
+    if (nextProps.error && !this.props.error) {
       const errorBoxBounceValue = new Animated.Value(30);
 
       Animated.spring(
@@ -162,27 +166,21 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
         }
       ).start();
 
-      this.setState({
-        errorBoxBounceValue,
-        error: nextProps.session.error,
-        isLoggingIn: nextProps.session.isLoggingIn,
-      });
+      this.setState({errorBoxBounceValue});
     }
   }
 
-  onUsernameTextChanged(event: any) {
+  onUsernameTextChange(event: any) {
     this.setState({ username: event.nativeEvent.text });
   }
 
-  onPasswordTextChanged(event: any) {
+  onPasswordTextChange(event: any) {
     this.setState({ password: event.nativeEvent.text });
   }
 
   onLoginPress() {
     if (this.state.username && this.state.password) {
-      this.props.dispatch(
-        sessionActions.login(this.state.username, this.state.password)
-      );
+      this.props.logIn(this.state.username, this.state.password);
     }
   }
 
@@ -191,14 +189,14 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
   }
 
   errorField() {
-    if (this.state.error) {
+    if (this.props.error) {
       const errorStyle = {
         transform: [{translateY: this.state.errorBoxBounceValue}]
       };
 
       return (
         <Animated.View style={[styles.error, errorStyle]}>
-          <Text style={styles.errorText}>{this.state.error}</Text>
+          <Text style={styles.errorText}>{this.props.error}</Text>
         </Animated.View>
       );
     }
@@ -207,7 +205,7 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
   }
 
   signInButton() {
-    if (this.state.isLoggingIn) {
+    if (this.props.isLoggingIn) {
       return (
         <View style={styles.signin}>
             <ActivityIndicator animating={true} size={"large"}></ActivityIndicator>
@@ -243,7 +241,7 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
                         placeholder="Email"
                         autoCorrect={false}
                         placeholderTextColor="rgba(0, 0, 0, 0.5)"
-                        onChange={this.onUsernameTextChanged.bind(this)}
+                        onChange={this.onUsernameTextChange.bind(this)}
                         value={this.state.username}
                         keyboardType="email-address"
                         autoCapitalize="none"
@@ -261,7 +259,7 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
                         style={[styles.input, styles.whiteFont]}
                         placeholder="Password"
                         placeholderTextColor="rgba(0, 0, 0, 0.5)"
-                        onChange={this.onPasswordTextChanged.bind(this)}
+                        onChange={this.onPasswordTextChange.bind(this)}
                         value={this.state.password}
                         returnKeyType={"go"}
                         onSubmitEditing={this.onLoginPress.bind(this)}
@@ -286,11 +284,17 @@ class LoginScreen extends React.Component<any, LoginScreenState> {
   }
 }
 
-// which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {
   return {
-    session: state.session
+    error: state.session.error,
+    isLoggingIn: state.session.isLoggingIn,
   };
 }
 
-export default connect(mapStateToProps)(LoginScreen);
+function mapDispatchToProps(dispatch: Dispatch<any>) {
+  return bindActionCreators({
+    logIn: sessionActions.logIn,
+  }, dispatch) as any;
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);

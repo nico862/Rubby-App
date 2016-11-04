@@ -16,7 +16,6 @@ export default function app(state: any = initialState, action: any = {}): any {
 
     case types.LOG_IN_SUCCESS:
       return state.merge({
-        rootLayout: "main",
         isLoggingIn: false,
         isAuthenticated: true,
         error: null,
@@ -29,15 +28,14 @@ export default function app(state: any = initialState, action: any = {}): any {
       });
 
     case types.LOG_OUT:
+      console.log("log out");
       return state.merge({
-        rootLayout: "login",
         isAuthenticated: false,
       });
 
     case types.REQUIRE_UPGRADE:
       return state.merge({
-        rootLayout: "upgrade",
-        isAuthenticated: false,
+        requireUpgrade: true,
       });
 
     default:

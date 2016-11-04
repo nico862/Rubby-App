@@ -1,10 +1,4 @@
-import * as sessionActions from "../reducers/session/actions";
-import * as calendarActions from "../reducers/calendar/actions";
-
 import * as React from "react";
-import {connect} from "react-redux";
-import config from "../config";
-
 import {
   Text,
   TouchableHighlight,
@@ -15,8 +9,14 @@ import {
   AppState,
   ActionSheetIOS
 } from "react-native";
+import {connect, Dispatch} from "react-redux";
+import {bindActionCreators} from "redux";
+import moment = require("moment");
 
-const moment = require("moment");
+import * as sessionActions from "../reducers/session/actions";
+import * as calendarActions from "../reducers/calendar/actions";
+import * as screenTypes from "./screen-types";
+import config from "../config";
 
 const circleStyle = {
   height: 36,
@@ -104,6 +104,19 @@ const styles = StyleSheet.create({
   } as TextStyle,
 });
 
+interface CalendarScreenProps {
+  isAuthenticated: boolean;
+  calendar: any;
+  iosLoading: boolean;
+  navigator: any;
+  fetchCalendar: () => any;
+  logOut: () => void;
+}
+
+interface CalendarScreenState {
+  loadDataIntervalId: number;
+}
+
 const ACTION_SHEET_BUTTONS = [
   "Log out",
   "Cancel"
@@ -112,7 +125,7 @@ const ACTION_SHEET_BUTTONS = [
 const LOGOUT_INDEX = 0;
 const CANCEL_INDEX = 1;
 
-class CalendarScreen extends React.Component<any, any> {
+class CalendarScreen extends React.Component<CalendarScreenProps, CalendarScreenState> {
   static navigatorStyle = {
     navBarBackgroundColor: "#fbece9",
     navBarButtonColor: "black"
@@ -127,13 +140,10 @@ class CalendarScreen extends React.Component<any, any> {
     ]
   };
 
-  constructor(props: any) {
+  constructor(props: CalendarScreenProps) {
     super(props);
 
     this.state = {
-      selectedIndex: 1,
-      calendarData: [],
-      calendarLoading: false,
       loadDataIntervalId: null
     };
 
@@ -161,11 +171,10 @@ class CalendarScreen extends React.Component<any, any> {
   }
 
   _loadData() {
-    if (this.props.session.isAuthenticated) {
-      this.props.dispatch(calendarActions.fetchCalendar());
+    if (this.props.isAuthenticated) {
+      this.props.fetchCalendar();
     }
   }
-
 
   onNavigatorEvent(event: any) {
     if (event.type === "NavBarButtonPress") {
@@ -186,34 +195,26 @@ class CalendarScreen extends React.Component<any, any> {
     AppState.removeEventListener("change", this._handleAppStateChange);
   }
 
-  componentWillReceiveProps(nextProps: any) {
-    if (nextProps.calendar.calendar !== this.props.calendar.calendar) {
-      this.setState({
-        calendarData: nextProps.calendar.calendar,
-      });
-    }
-
-    this.setState({calendarLoading: nextProps.calendar.loading});
-  }
-
   renderCalendar() {
-    return this.state.calendarData.map(this.renderMonth);
+    return this.props.calendar.map(this.renderMonth);
   }
 
   renderMonth(month: any) {
     const weeks = month.weeks.map(this.renderWeek);
 
+    const dayHeaders = ["M", "T", "W", "T", "F", "S", "S"].map((day: string, index: number) => {
+      return (
+        <View style={styles.dayLetterContainer} key={index}>
+          <Text style={styles.dayLetter}>{day}</Text>
+        </View>
+      );
+    });
+
     return(
       <View key={month.name}>
         <Text style={styles.month}>{month.name.toUpperCase()}</Text>
         <View style={styles.dayNames}>
-          <View style={styles.dayLetterContainer}><Text style={styles.dayLetter}>M</Text></View>
-          <View style={styles.dayLetterContainer}><Text style={styles.dayLetter}>T</Text></View>
-          <View style={styles.dayLetterContainer}><Text style={styles.dayLetter}>W</Text></View>
-          <View style={styles.dayLetterContainer}><Text style={styles.dayLetter}>T</Text></View>
-          <View style={styles.dayLetterContainer}><Text style={styles.dayLetter}>F</Text></View>
-          <View style={styles.dayLetterContainer}><Text style={styles.dayLetter}>S</Text></View>
-          <View style={styles.dayLetterContainer}><Text style={styles.dayLetter}>S</Text></View>
+          {dayHeaders}
         </View>
 
         {weeks}
@@ -226,7 +227,7 @@ class CalendarScreen extends React.Component<any, any> {
 
     this.props.navigator.push({
       title: date.format("ddd DD MMM"),
-      screen: "RuubyPA.CalendarDayScreen",
+      screen: screenTypes.SCREEN_CALENDAR_DAY,
       backButtonTitle: "Back",
       passProps: {
         date: dateString
@@ -312,7 +313,7 @@ class CalendarScreen extends React.Component<any, any> {
       },
       (buttonIndex: number) => {
         if (ACTION_SHEET_BUTTONS[LOGOUT_INDEX] === ACTION_SHEET_BUTTONS[buttonIndex]) {
-          this.props.dispatch(sessionActions.logout());
+          this.props.logOut();
         }
     });
   }
@@ -321,9 +322,16 @@ class CalendarScreen extends React.Component<any, any> {
 // which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {
   return {
-    session: state.session,
-    calendar: state.calendar,
+    isAuthenticated: state.session.isAuthenticated,
+    calendar: state.calendar.calendar,
+    logOut: sessionActions.logOut
   };
 }
 
-export default connect(mapStateToProps)(CalendarScreen);
+function mapDispatchToProps(dispatch: Dispatch<any>) {
+  return bindActionCreators({
+    fetchCalendar: calendarActions.fetchCalendar
+  }, dispatch) as any;
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CalendarScreen);

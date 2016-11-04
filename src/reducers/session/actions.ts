@@ -23,7 +23,7 @@ export function initialiseApp() {
   };
 }
 
-export function login(username: string, password: string) {
+export function logIn(username: string, password: string) {
   return (dispatch: Dispatch<any>, getState: any): void => {
     // login logic would go here, and when it"s done, we switch app roots
     dispatch(loginAttempt());
@@ -36,7 +36,7 @@ export function login(username: string, password: string) {
   };
 }
 
-export function logout() {
+export function logOut() {
   return (dispatch: Dispatch<any>, getState: any): void => {
     sessionApi.removeAccessTokens()
       .then( () => dispatch(logOutAction()) );
@@ -44,11 +44,11 @@ export function logout() {
 }
 
 export function logOutAction() {
-  return {type: types.LOG_OUT, payload: {}};
+  return {type: types.LOG_OUT};
 }
 
 function loginAttempt() {
-  return {type: types.LOG_IN_ATTEMPT, payload: {}};
+  return {type: types.LOG_IN_ATTEMPT};
 }
 
 function logInSuccess() {
