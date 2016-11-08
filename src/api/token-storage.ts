@@ -26,7 +26,6 @@ export function removeTokens(): Promise<string> {
 }
 
 export function storeTokens(rawTokenData: RawTokenData): Promise<boolean> {
-  console.log(rawTokenData);
   const tokenData: TokenData = {
     accessToken: rawTokenData.access_token,
     refreshToken: rawTokenData.refresh_token

@@ -53,6 +53,7 @@ export default function calendarDay(state: any = initialState, action: any = {})
 
     case types.SET_HOUR_UPDATE_FAIL:
       return state
+        .setIn(["diary", "hours", action.payload.hourIndex, "isUpdating"], false)
         .setIn(["diary", "hours", action.payload.hourIndex, "hasErrored"], true);
 
     case types.SET_HOUR_LOCATION:

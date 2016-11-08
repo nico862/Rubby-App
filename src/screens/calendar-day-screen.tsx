@@ -24,6 +24,7 @@ export interface Hour {
   isAvailable?: boolean;
   nextHourAvailable?: boolean;
   isUpdating?: boolean;
+  hasErrored?: boolean;
 }
 
 export interface Booking {
@@ -160,6 +161,12 @@ const styles = StyleSheet.create({
     right: 10,
   } as TextStyle,
 
+  error: {
+    color: "rgba(200, 0, 0, 0.3)",
+    fontSize: 11,
+    right: 10,
+  } as TextStyle,
+
   feedbackContainer: {
     marginTop: 20,
     alignItems: "center"
@@ -237,6 +244,9 @@ class CalendarDayScreen extends React.Component<CalendarDayScreenProps, {}> {
 
     if (hour.isUpdating) {
       note = (<Text style={styles.updating}>UPDATING</Text>);
+    }
+    else if (hour.hasErrored) {
+      note = (<Text style={styles.error}>ERROR UPDATING</Text>);
     }
 
     // check if this hour or next hour is available

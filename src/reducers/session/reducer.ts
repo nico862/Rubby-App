@@ -28,7 +28,6 @@ export default function app(state: any = initialState, action: any = {}): any {
       });
 
     case types.LOG_OUT:
-      console.log("log out");
       return state.merge({
         isAuthenticated: false,
       });

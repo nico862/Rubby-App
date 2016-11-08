@@ -29,7 +29,6 @@ class App {
       store.getState().session.isAuthenticated ? "main" : "login";
 
     if (this.currentRootLayout !== newRootLayout) {
-      console.log(newRootLayout);
       this.currentRootLayout = newRootLayout;
       this.startApp(newRootLayout);
     }
