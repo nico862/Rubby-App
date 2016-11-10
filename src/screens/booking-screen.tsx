@@ -1,6 +1,4 @@
 import * as React from "react";
-import * as moment from "moment";
-
 import {
   Text,
   View,
@@ -12,6 +10,7 @@ import {
   Linking,
   Dimensions
 } from "react-native";
+import moment = require("moment");
 
 const windowSize = Dimensions.get("window");
 const SIZE_RATIO = windowSize.width >= 375 ? 1.14 : 1;

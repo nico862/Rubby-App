@@ -1,11 +1,4 @@
-import * as bookingsActions from "../reducers/bookings/actions";
-import * as sessionActions from "../reducers/session/actions";
-
 import * as React from "react";
-import {connect} from "react-redux";
-import config from "../config";
-import moment = require("moment");
-
 import { SegmentedControls } from "react-native-radio-buttons";
 import {
   Text,
@@ -18,6 +11,14 @@ import {
   ActionSheetIOS,
   Dimensions
 } from "react-native";
+import {connect, Dispatch} from "react-redux";
+import {bindActionCreators} from "redux";
+import moment = require("moment");
+
+import * as bookingsActions from "../reducers/bookings/actions";
+import * as sessionActions from "../reducers/session/actions";
+import * as screenTypes from "./screen-types";
+import config from "../config";
 
 const windowSize = Dimensions.get("window");
 const SIZE_RATIO = windowSize.width >= 375 ? 1.14 : 1;
@@ -65,6 +66,22 @@ const styles = StyleSheet.create({
   } as TextStyle,
 });
 
+interface BookingsScreenProps {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  navigator: any;
+  fetchBookings: () => any;
+  logOut: () => any;
+  bookings: any;
+}
+
+interface BookingsScreenState {
+  loadDataIntervalId?: number;
+  selectedIndex?: number;
+  completedBookings?: React.ListViewDataSource;
+  upcomingBookings?: React.ListViewDataSource;
+}
+
 const ACTION_SHEET_BUTTONS = [
   "Log out",
   "Cancel"
@@ -73,7 +90,7 @@ const ACTION_SHEET_BUTTONS = [
 const LOGOUT_INDEX = 0;
 const CANCEL_INDEX = 1;
 
-class BookingsScreen extends React.Component<any, any> {
+class BookingsScreen extends React.Component<BookingsScreenProps, BookingsScreenState> {
 
   static navigatorStyle = {
     navBarBackgroundColor: "#fbece9",
@@ -89,28 +106,35 @@ class BookingsScreen extends React.Component<any, any> {
     ]
   };
 
-  constructor(props: any) {
+  constructor(props: BookingsScreenProps) {
     super(props);
 
-    let completedBookings = new ListView.DataSource({
+    const completedBookings = new ListView.DataSource({
       rowHasChanged: this._rowHasChanged,
     });
 
-    let upcomingBookings = new ListView.DataSource({
+    const upcomingBookings = new ListView.DataSource({
       rowHasChanged: this._rowHasChanged,
     });
 
     this.state = {
       selectedIndex: 1,
+      loadDataIntervalId: null,
       completedBookings,
       upcomingBookings,
-      bookingsAreLoading: false,
-      loadDataIntervalId: null
     };
 
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     this._handleAppStateChange = this._handleAppStateChange.bind(this);
+  }
 
+  componentWillReceiveProps(nextProps: BookingsScreenProps) {
+    if (nextProps.bookings !== this.props.bookings) {
+      this.setState({
+        completedBookings: this.state.completedBookings.cloneWithRows(nextProps.bookings.completed),
+        upcomingBookings: this.state.upcomingBookings.cloneWithRows(nextProps.bookings.upcoming)
+      });
+    }
   }
 
   onNavigatorEvent(event: any) {
@@ -137,8 +161,8 @@ class BookingsScreen extends React.Component<any, any> {
   }
 
   _loadData() {
-    if (this.props.session.isAuthenticated) {
-      this.props.dispatch(bookingsActions.fetchBookings());
+    if (this.props.isAuthenticated) {
+      this.props.fetchBookings();
     }
   }
 
@@ -151,17 +175,6 @@ class BookingsScreen extends React.Component<any, any> {
     AppState.addEventListener("change", this._handleAppStateChange);
     this._loadData();
     this._startDataInterval();
-  }
-
-  componentWillReceiveProps(nextProps: any) {
-    if (nextProps.bookings.bookings !== this.props.bookings.bookings) {
-      this.setState({
-        completedBookings: this.state.completedBookings.cloneWithRows(nextProps.bookings.bookings.completed),
-        upcomingBookings: this.state.upcomingBookings.cloneWithRows(nextProps.bookings.bookings.upcoming)
-      });
-    }
-
-    this.setState({bookingsAreLoading: nextProps.bookings.loading});
   }
 
   setSelectedOption(selectedSegment: string, selectedIndex: number) {
@@ -209,7 +222,7 @@ class BookingsScreen extends React.Component<any, any> {
   onBookingPress(booking: any) {
     this.props.navigator.push({
       title: "Booking",
-      screen: "RuubyPA.BookingScreen",
+      screen: screenTypes.SCREEN_BOOKING,
       backButtonTitle: "Back",
       passProps: {
         booking: booking
@@ -218,7 +231,7 @@ class BookingsScreen extends React.Component<any, any> {
   }
 
   renderUpcoming() {
-    if ((this.state.selectedIndex === 0) || this.state.bookingsAreLoading) {
+    if (this.state.selectedIndex === 0) {
       return null;
     }
     else if (this.state.upcomingBookings.getRowCount()) {
@@ -239,7 +252,7 @@ class BookingsScreen extends React.Component<any, any> {
   }
 
   renderCompleted() {
-    if ((this.state.selectedIndex === 1) || this.state.bookingsAreLoading) {
+    if (this.state.selectedIndex === 1) {
       return null;
     }
     else if (this.state.completedBookings.getRowCount()) {
@@ -253,13 +266,11 @@ class BookingsScreen extends React.Component<any, any> {
     else {
       return (
         <View style={styles.noBookingsView}>
-          <Text style={styles.noBookings}>You have no upcoming bookings</Text>
+          <Text style={styles.noBookings}>You have no completed bookings</Text>
         </View>
       );
     }
   }
-
-  // <Spinner visible={this.state.bookingsAreLoading} />
 
   render() {
     return (
@@ -289,18 +300,24 @@ class BookingsScreen extends React.Component<any, any> {
       },
       (buttonIndex: number) => {
         if (ACTION_SHEET_BUTTONS[LOGOUT_INDEX] === ACTION_SHEET_BUTTONS[buttonIndex]) {
-          this.props.dispatch(sessionActions.logout());
+          this.props.logOut();
         }
     });
   }
 }
 
-// which props do we want to inject, given the global state?
 function mapStateToProps(state: any) {
   return {
-    session: state.session,
-    bookings: state.bookings,
+    isAuthenticated: state.session.isAuthenticated,
+    bookings: state.bookings.bookings,
   };
 }
 
-export default connect(mapStateToProps)(BookingsScreen);
+function mapDispatchToProps(dispatch: Dispatch<any>) {
+  return bindActionCreators({
+    fetchBookings: bookingsActions.fetchBookings,
+    logOut: sessionActions.logOut,
+  }, dispatch) as any;
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BookingsScreen);

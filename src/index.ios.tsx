@@ -6,6 +6,7 @@ import thunk from "redux-thunk";
 import reducers from "./reducers/index";
 import * as sessionActions from "./reducers/session/actions";
 import {registerScreens} from "./screens/index.ios";
+import * as screenTypes from "./screens/screen-types";
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 const reducer = combineReducers(reducers);
@@ -23,7 +24,9 @@ class App {
   }
 
   onStoreUpdate() {
-    const newRootLayout = store.getState().session.rootLayout;
+    const newRootLayout =
+      store.getState().session.requireUpgrade ? "upgrade" :
+      store.getState().session.isAuthenticated ? "main" : "login";
 
     if (this.currentRootLayout !== newRootLayout) {
       this.currentRootLayout = newRootLayout;
@@ -33,14 +36,10 @@ class App {
 
   startApp(layout: string) {
     switch (layout) {
-      case "wait":
-        console.log("Waiting for app to start up");
-        return;
-
       case "upgrade":
         Navigation.startSingleScreenApp({
           screen: {
-            screen: "RuubyPA.UpgradeScreen",
+            screen: screenTypes.SCREEN_UPGRADE,
             title: "Upgrade",
             navigatorStyle: {}
           },
@@ -51,7 +50,7 @@ class App {
       case "login":
         Navigation.startSingleScreenApp({
           screen: {
-            screen: "RuubyPA.LoginScreen",
+            screen: screenTypes.SCREEN_LOG_IN,
             title: "Login",
             navigatorStyle: {}
           },
@@ -63,14 +62,14 @@ class App {
         Navigation.startTabBasedApp({
           tabs: [
             {
-              screen: "RuubyPA.BookingsScreen",
+              screen: screenTypes.SCREEN_BOOKINGS,
               icon: require("../resources/images/buttons/bookings.png"),
               selectedIcon: require("../resources/images/buttons/bookings.png"),
               title: "Bookings",
               overrideBackPress: true,
             },
             {
-              screen: "RuubyPA.CalendarScreen",
+              screen: screenTypes.SCREEN_CALENDAR,
               icon: require("../resources/images/buttons/calendar.png"),
               selectedIcon: require("../resources/images/buttons/calendar.png"),
               title: "Availability",

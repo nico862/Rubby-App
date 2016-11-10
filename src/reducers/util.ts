@@ -20,5 +20,5 @@ export function handleApiError(dispatch: Dispatch<any>, errorMethod: (err: Error
 }
 
 export function promptUpgradeAction() {
-  return {type: types.REQUIRE_UPGRADE, payload: {}};
+  return {type: types.REQUIRE_UPGRADE};
 }
