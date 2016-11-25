@@ -1,4 +1,4 @@
 declare module "react-native-radio-buttons" {
-  export var SegmentedControls: any;
+  export const SegmentedControls: any;
   export type SegmentedControls = any;
 }

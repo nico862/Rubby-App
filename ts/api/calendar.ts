@@ -1,3 +1,5 @@
+import * as moment from "moment";
+
 import ApiRequest from "./request";
 
 export function getCalendar(): Promise<any> {

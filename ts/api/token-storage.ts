@@ -1,4 +1,5 @@
 import { AsyncStorage } from "react-native";
+import * as React from "react";
 
 const TOKEN_STORAGE_KEY = "apiAccessToken";
 
@@ -14,18 +15,18 @@ export interface TokenData {
   accessToken: string;
 }
 
-export function getTokens(): Promise<TokenData> {
+export function getTokens(): React.Promise<TokenData> {
   return AsyncStorage.getItem(TOKEN_STORAGE_KEY)
     .then(data => {
       return JSON.parse(data);
     });
 }
 
-export function removeTokens(): Promise<string> {
+export function removeTokens(): React.Promise<string> {
   return AsyncStorage.removeItem(TOKEN_STORAGE_KEY);
 }
 
-export function storeTokens(rawTokenData: RawTokenData): Promise<boolean> {
+export function storeTokens(rawTokenData: RawTokenData): React.Promise<boolean> {
   const tokenData: TokenData = {
     accessToken: rawTokenData.access_token,
     refreshToken: rawTokenData.refresh_token

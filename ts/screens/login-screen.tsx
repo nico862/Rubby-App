@@ -14,7 +14,8 @@ import {
   Linking,
   ActivityIndicator
 } from "react-native";
-import {connect, Dispatch} from "react-redux";
+import {connect, ConnectClass} from "react-redux";
+import {Dispatch} from "redux";
 import {bindActionCreators} from "redux";
 
 import * as sessionActions from "../reducers/session/actions";
@@ -246,7 +247,7 @@ class LoginScreen extends React.Component<LoginScreenProps, LoginScreenState> {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         returnKeyType={"next"}
-                        onSubmitEditing={(event) => {
+                        onSubmitEditing={_event => {
                           (this.refs["passwordInput"] as HTMLElement).focus();
                         }}
                     />
@@ -254,7 +255,7 @@ class LoginScreen extends React.Component<LoginScreenProps, LoginScreenState> {
                 <View style={styles.inputContainer}>
                     <TextInput
                         ref="passwordInput"
-                        password={true}
+                        secureTextEntry={true}
                         autoCorrect={false}
                         style={[styles.input, styles.whiteFont]}
                         placeholder="Password"
@@ -297,4 +298,4 @@ function mapDispatchToProps(dispatch: Dispatch<any>) {
   }, dispatch) as any;
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen) as ConnectClass<any, any>;

@@ -9,7 +9,8 @@ import {
   AppState,
   ActionSheetIOS
 } from "react-native";
-import {connect, Dispatch} from "react-redux";
+import {connect, ConnectClass} from "react-redux";
+import {Dispatch} from "redux";
 import {bindActionCreators} from "redux";
 import moment = require("moment");
 
@@ -334,4 +335,4 @@ function mapDispatchToProps(dispatch: Dispatch<any>) {
   }, dispatch) as any;
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CalendarScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(CalendarScreen) as ConnectClass<any, any>;

@@ -1,4 +1,4 @@
-import {Dispatch} from "react-redux";
+import {Dispatch} from "redux";
 
 import * as types from "./session/action-types";
 import {logOutAction} from "./session/actions";

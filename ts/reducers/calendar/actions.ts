@@ -1,4 +1,4 @@
-import {Dispatch} from "react-redux";
+import {Dispatch} from "redux";
 
 import * as types from "./action-types";
 import * as calendarApi from "../../api/calendar";
@@ -16,6 +16,6 @@ function fetchCalendarSuccess(calendar: any) {
   return {type: types.FETCH_CALENDAR_SUCCESS, calendar};
 }
 
-function fetchCalendarFail(err: Error) {
+function fetchCalendarFail() {
   return {type: types.FETCH_CALENDAR_FAIL};
 }

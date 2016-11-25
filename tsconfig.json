@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
+    "outDir": "build/",
+    "rootDir": "ts/",
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "jsx": "react",
-    "outDir": "build/",
     "removeComments": false,
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "declaration": true,
-    "allowSyntheticDefaultImports": true
+    "noUnusedParameters": true,
+    "noUnusedLocals": true
   },
   "exclude": [
     "node_modules"

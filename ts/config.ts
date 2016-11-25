@@ -11,7 +11,9 @@ export interface Config {
   appVersion: string;
 }
 
+declare const __DEV__: string;
 let config: Config;
+
 if (__DEV__) {
   config = require("../conf/dev.json");
 }

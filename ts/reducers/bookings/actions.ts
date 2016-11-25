@@ -1,4 +1,4 @@
-import {Dispatch} from "react-redux";
+import {Dispatch} from "redux";
 
 import {getBookings} from "../../api/bookings";
 import * as types from "./action-types";
@@ -13,7 +13,7 @@ export function fetchBookingsFail() {
 }
 
 export function fetchBookings() {
-  return (dispatch: Dispatch<any>, getState: any) => {
+  return (dispatch: Dispatch<any>) => {
     getBookings()
       .then(data => dispatch(fetchBookingsSuccess(data)))
       .catch(handleApiError.bind(null, dispatch, fetchBookingsFail));

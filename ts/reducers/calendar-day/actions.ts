@@ -1,6 +1,5 @@
-import {Dispatch} from "react-redux";
-import * as moment from "moment";
-import "moment-timezone";
+import {Dispatch} from "redux";
+import * as moment from "moment-timezone";
 
 import * as types from "./action-types";
 import * as calendarApi from "../../api/calendar";
@@ -73,7 +72,7 @@ function fetchDayDiarySuccess(diary: any) {
   return {type: types.FETCH_DAY_DIARY_SUCCESS, payload: {diary}};
 }
 
-function fetchDayDiaryFail(err: Error) {
+function fetchDayDiaryFail() {
   return {type: types.FETCH_DAY_DIARY_FAIL};
 }
 

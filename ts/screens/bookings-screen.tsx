@@ -11,7 +11,8 @@ import {
   ActionSheetIOS,
   Dimensions
 } from "react-native";
-import {connect, Dispatch} from "react-redux";
+import {Dispatch} from "redux";
+import {connect, ConnectClass} from "react-redux";
 import {bindActionCreators} from "redux";
 import moment = require("moment");
 
@@ -177,7 +178,7 @@ class BookingsScreen extends React.Component<BookingsScreenProps, BookingsScreen
     this._startDataInterval();
   }
 
-  setSelectedOption(selectedSegment: string, selectedIndex: number) {
+  setSelectedOption(_selectedSegment: string, selectedIndex: number) {
     this.setState({
       selectedIndex
     });
@@ -187,7 +188,7 @@ class BookingsScreen extends React.Component<BookingsScreenProps, BookingsScreen
     return oldRow !== newRow;
   }
 
-  renderRow(booking: any, sectionID: string, rowID: string) {
+  renderRow(booking: any, _sectionID: string, _rowID: string) {
     const dateTime = moment(booking.timeStarts).format("ddd D MMM HH:mm");
 
     const treatments = booking.bookingTreatments.map((bookingTreatment: any) => {
@@ -320,4 +321,4 @@ function mapDispatchToProps(dispatch: Dispatch<any>) {
   }, dispatch) as any;
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BookingsScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(BookingsScreen) as ConnectClass<any, any>;

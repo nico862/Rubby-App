@@ -1,13 +1,11 @@
-import {Dispatch} from "react-redux";
+import {Dispatch} from "redux";
 
 import * as types from "./action-types";
 import * as sessionApi from "../../api/session";
 import {handleApiError} from "../util";
 
-declare const fetch: (url: string, options?: Object) => Promise<any>;
-
 export function initialiseApp() {
-  return (dispatch: Dispatch<any>, getState: any): void => {
+  return (dispatch: Dispatch<any>): void => {
     sessionApi.hasAccessToken()
       .then(result => {
         if (result) {
@@ -17,14 +15,14 @@ export function initialiseApp() {
           dispatch(logOutAction());
         }
       })
-      .catch(err => {
+      .catch(() => {
         dispatch(logOutAction());
       });
   };
 }
 
 export function logIn(username: string, password: string) {
-  return (dispatch: Dispatch<any>, getState: any): void => {
+  return (dispatch: Dispatch<any>): void => {
     // login logic would go here, and when it"s done, we switch app roots
     dispatch(loginAttempt());
 
@@ -37,7 +35,7 @@ export function logIn(username: string, password: string) {
 }
 
 export function logOut() {
-  return (dispatch: Dispatch<any>, getState: any): void => {
+  return (dispatch: Dispatch<any>): void => {
     sessionApi.removeAccessTokens()
       .then( () => dispatch(logOutAction()) );
   };

@@ -1,4 +1,6 @@
 import {Navigation} from "react-native-navigation";
+import * as Redux from "redux";
+import * as ReactRedux from "react-redux";
 
 import BookingsScreen from "./bookings-screen";
 import BookingScreen from "./booking-screen";

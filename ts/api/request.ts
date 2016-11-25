@@ -1,6 +1,7 @@
 import * as httpStatus from "http-status";
 import * as _ from "lodash";
 import * as semver from "semver";
+import * as React from "react";
 
 import * as tokenStorage from "./token-storage";
 import config from "../config";
@@ -62,7 +63,7 @@ export default class ApiRequest {
       .then(tokenStorage.storeTokens);
   }
 
-  authenticateRefreshToken(): Promise<any> {
+  authenticateRefreshToken(): React.Promise<boolean> {
     return tokenStorage.getTokens()
       .then(tokens => {
         const postParams = {
@@ -70,14 +71,17 @@ export default class ApiRequest {
           grant_type: "refresh_token",
         };
 
-        return fetch(`${ config.api.host }/oauth/token`, {
+        // need to cast this promise as a React promise!
+        const request = fetch(`${ config.api.host }/oauth/token`, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             "Authorization": `Basic ${ config.api.clientAuth }`
           },
           body: formUrlencoded(postParams)
-        })
+        }) as any as React.Promise<any>;
+
+        return request
           .then(this._validateResponse)
           .then(res => res.json())
           .then(tokenStorage.storeTokens);
@@ -112,7 +116,7 @@ export default class ApiRequest {
     throw new Error(REQUEST_ERROR);
   }
 
-  private _authenticatedRequest(): Promise<any> {
+  private _authenticatedRequest(): React.Promise<any> {
     return tokenStorage.getTokens()
       .then(tokens => {
         const options = _.clone(this.options);
