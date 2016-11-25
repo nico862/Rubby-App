@@ -156,6 +156,18 @@ const styles = StyleSheet.create({
     right: 10,
   },
 
+  availableContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  } as ViewStyle,
+
+  availableText: {
+    color: "rgba(0, 0, 0, 0.3)",
+    fontSize: 11,
+    right: 10,
+    marginRight: 10
+  } as TextStyle,
+
   updating: {
     color: "rgba(0, 0, 0, 0.3)",
     fontSize: 11,
@@ -239,7 +251,12 @@ class CalendarDayScreen extends React.Component<CalendarDayScreenProps, {}> {
       }
 
       if (!hour.hasBooking && !hour.isUpdating) {
-        note = (<Image style={styles.availableIcon} source={require("../../resources/images/calendar/available.png")} />);
+        note = (
+          <View style={styles.availableContainer}>
+            <Text style={styles.availableText}>AVAILABLE</Text>
+            <Image style={styles.availableIcon} source={require("../../resources/images/calendar/available.png")} />
+          </View>
+        );
       }
     }
 
