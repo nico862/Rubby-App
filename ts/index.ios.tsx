@@ -66,13 +66,15 @@ class App {
               icon: require("../resources/images/buttons/bookings.png"),
               selectedIcon: require("../resources/images/buttons/bookings.png"),
               title: "Bookings",
-              overrideBackPress: true,
+              label: "Bookings",
+              overrideBackPress: true
             },
             {
               screen: screenTypes.SCREEN_CALENDAR,
               icon: require("../resources/images/buttons/calendar.png"),
               selectedIcon: require("../resources/images/buttons/calendar.png"),
               title: "Availability",
+              label: "Availability"
             }
           ],
           tabsStyle: {
