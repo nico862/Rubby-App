@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
 
   booking: {
     position: "absolute",
-    backgroundColor: "#ddd8d8",
+    backgroundColor: "#333333",
     borderRadius: 10,
     padding: 7,
     left: 0,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
 
   bookingText: {
-    color: "#666060"
+    color: "white"
   },
 
   bookingHeader: {
@@ -246,11 +246,9 @@ class CalendarDayScreen extends React.Component<CalendarDayScreenProps, {}> {
     let note: JSX.Element;
 
     if (hour.isAvailable) {
-      if (!hour.hasBooking) {
-        containerStyle = styles.rowContainerAvailable;
-      }
+      containerStyle = styles.rowContainerAvailable;
 
-      if (!hour.hasBooking && !hour.isUpdating) {
+      if (!hour.isUpdating) {
         note = (
           <View style={styles.availableContainer}>
             <Text style={styles.availableText}>AVAILABLE</Text>
