@@ -1,13 +1,15 @@
 # Ruuby PA app
 
-Install deps
 
+## Install deps
+    npm install -g typescript tslint typings react-native-cli
+    npm install -g gulp-cli
     npm i
 
-Build code:
+## Build code:
 
-    npm run gulp watch
+    gulp
 
-Run in simulator:
+## Run in ios simulator:
 
-    npm run -- react-native run-ios --simulator="iPhone 5"
+    react-native run-ios
