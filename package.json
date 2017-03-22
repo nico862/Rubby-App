@@ -8,7 +8,8 @@
     "build": "gulp build",
     "build:watch": "gulp build:watch",
     "test": "gulp test",
-    "test:watch": "gulp test:watch"
+    "test:watch": "gulp test:watch",
+    "clean-android": "cd android && ./gradlew clean && rm -f app/src/main/assets/index.android.*"
   },
   "devDependencies": {
     "@types/http-status": "^0.2.29",
