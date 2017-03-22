@@ -5,7 +5,7 @@ import thunk from "redux-thunk";
 
 import reducers from "./reducers/index";
 import * as sessionActions from "./reducers/session/actions";
-import {registerScreens} from "./screens/index.ios";
+import {registerScreens} from "./screens";
 import * as screenTypes from "./screens/screen-types";
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
