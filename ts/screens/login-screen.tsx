@@ -68,10 +68,9 @@ const styles = StyleSheet.create({
         flex: .25,
     } as ViewStyle,
     inputContainer: {
-        padding: 10,
+        padding: 0,
         borderWidth: 1,
         height: 41,
-        borderBottomColor: "rgba(0, 0, 0, 0.7)",
         borderColor: "transparent",
     },
     input: {
