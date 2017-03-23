@@ -1,48 +1,101 @@
-import * as React from "react";
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  TextStyle
-} from "react-native";
+import {createStore, applyMiddleware, combineReducers} from "redux";
+import {Provider} from "react-redux";
+import {Navigation} from "react-native-navigation";
+import thunk from "redux-thunk";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF",
-  } as TextStyle,
-  welcome: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 10,
-  } as TextStyle,
-  instructions: {
-    textAlign: "center",
-    color: "#333333",
-    marginBottom: 5,
-  } as TextStyle,
-});
+import reducers from "./reducers/index";
+import * as sessionActions from "./reducers/session/actions";
+import {registerScreens} from "./screens";
+import * as screenTypes from "./screens/screen-types";
 
-class RuubyPA extends React.Component<{}, {}> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{"\n"}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+const reducer = combineReducers(reducers);
+const store = createStoreWithMiddleware(reducer);
+
+registerScreens(store, Provider);
+
+class App {
+  currentRootLayout: string;
+
+  constructor() {
+    // since react-redux only works on components, we need to subscribe this class manually
+    store.subscribe(this.onStoreUpdate.bind(this));
+    store.dispatch(sessionActions.initialiseApp());
+  }
+
+  onStoreUpdate() {
+    const newRootLayout =
+      store.getState().session.requireUpgrade ? "upgrade" :
+        store.getState().session.isAuthenticated ? "main" : "login";
+
+    if (this.currentRootLayout !== newRootLayout) {
+      this.currentRootLayout = newRootLayout;
+      this.startApp(newRootLayout);
+    }
+  }
+
+  startApp(layout: string) {
+    switch (layout) {
+      case "upgrade":
+        Navigation.startSingleScreenApp({
+          screen: {
+            screen: screenTypes.SCREEN_UPGRADE,
+            title: "Upgrade",
+            navigatorStyle: {}
+          },
+        });
+
+        return;
+
+      case "login":
+        Navigation.startSingleScreenApp({
+          screen: {
+            screen: screenTypes.SCREEN_LOG_IN,
+            title: "Login",
+            navigatorStyle: {}
+          },
+        });
+
+        return;
+
+      case "main":
+        Navigation.startTabBasedApp({
+          tabs: [
+            {
+              screen: screenTypes.SCREEN_BOOKINGS,
+              icon: require("../resources/images/buttons/bookings.png"),
+              selectedIcon: require("../resources/images/buttons/bookings.png"),
+              title: "Bookings",
+              label: "Bookings",
+              overrideBackPress: true
+            },
+            {
+              screen: screenTypes.SCREEN_CALENDAR,
+              icon: require("../resources/images/buttons/calendar.png"),
+              selectedIcon: require("../resources/images/buttons/calendar.png"),
+              title: "Availability",
+              label: "Availability"
+            }
+          ],
+          tabsStyle: {
+            tabBarBackgroundColor: "black",
+            tabBarButtonColor: "#666666",
+            tabBarSelectedButtonColor: "white"
+          },
+          animationType: "slide-down",
+          title: "Ruuby PA",
+          appStyle: {
+            bottomTabBadgeTextColor: "#ffffff",
+            bottomTabBadgeBackgroundColor: "#ff0000",
+          }
+        });
+
+        return;
+
+      default:
+        console.error("Unknown app root");
+    }
   }
 }
 
-AppRegistry.registerComponent("RuubyPA", () => RuubyPA);
+export default App;
