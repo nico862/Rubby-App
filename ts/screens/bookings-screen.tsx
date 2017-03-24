@@ -8,7 +8,6 @@ import {
   TouchableHighlight,
   ListView,
   AppState,
-  ActionSheetIOS,
   Dimensions
 } from "react-native";
 import {Dispatch} from "redux";
@@ -20,6 +19,7 @@ import * as bookingsActions from "../reducers/bookings/actions";
 import * as sessionActions from "../reducers/session/actions";
 import * as screenTypes from "./screen-types";
 import config from "../config";
+import ActionSheet from "react-native-actionsheet";
 
 const windowSize = Dimensions.get("window");
 const SIZE_RATIO = windowSize.width >= 375 ? 1.14 : 1;
@@ -106,6 +106,8 @@ class BookingsScreen extends React.Component<BookingsScreenProps, BookingsScreen
       }
     ]
   };
+
+  ActionSheet: any;
 
   constructor(props: BookingsScreenProps) {
     super(props);
@@ -273,6 +275,23 @@ class BookingsScreen extends React.Component<BookingsScreenProps, BookingsScreen
     }
   }
 
+  renderActionSheet() {
+    const onPress = (buttonIndex: number) => {
+      if (ACTION_SHEET_BUTTONS[LOGOUT_INDEX] === ACTION_SHEET_BUTTONS[buttonIndex]) {
+        this.props.logOut();
+      }};
+
+    return (
+      <ActionSheet
+        ref={(o: any) => this.ActionSheet = o}
+        options={ACTION_SHEET_BUTTONS}
+        cancelButtonIndex={CANCEL_INDEX}
+        destructiveButtonIndex={LOGOUT_INDEX}
+        onPress={onPress}
+      />
+    );
+  }
+
   render() {
     return (
         <View style={styles.container}>
@@ -289,21 +308,13 @@ class BookingsScreen extends React.Component<BookingsScreenProps, BookingsScreen
 
           { this.renderCompleted() }
           { this.renderUpcoming() }
+          { this.renderActionSheet() }
         </View>
     );
   }
 
   showActionSheet() {
-    ActionSheetIOS.showActionSheetWithOptions({
-        options: ACTION_SHEET_BUTTONS,
-        cancelButtonIndex: CANCEL_INDEX,
-        destructiveButtonIndex: LOGOUT_INDEX,
-      },
-      (buttonIndex: number) => {
-        if (ACTION_SHEET_BUTTONS[LOGOUT_INDEX] === ACTION_SHEET_BUTTONS[buttonIndex]) {
-          this.props.logOut();
-        }
-    });
+    this.ActionSheet.show();
   }
 }
 

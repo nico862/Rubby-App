@@ -12,7 +12,8 @@ import {
   TouchableOpacity,
   Animated,
   Linking,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from "react-native";
 import {connect, ConnectClass} from "react-redux";
 import {Dispatch} from "redux";
@@ -70,16 +71,17 @@ const styles = StyleSheet.create({
     inputContainer: {
         padding: 0,
         borderWidth: 1,
-        height: 41,
+        height:  41,
+        borderBottomColor: "rgba(0, 0, 0, 0.7)",
         borderColor: "transparent",
     },
     input: {
       position: "absolute",
       left: 61,
-      top: 12,
+      top: Platform.OS === "android" ? 8 : 12,
       right: 0,
-      height: 20,
-      fontSize: SIZE_RATIO * 14
+      height: Platform.OS === "android" ? 40 : 20,
+      fontSize: SIZE_RATIO * 14,
     },
     forgotContainer: {
       alignItems: "flex-end",

@@ -6,13 +6,13 @@ import {
   StyleSheet,
   TextStyle,
   ViewStyle,
-  AppState,
-  ActionSheetIOS
+  AppState
 } from "react-native";
 import {connect, ConnectClass} from "react-redux";
 import {Dispatch} from "redux";
 import {bindActionCreators} from "redux";
 import moment = require("moment");
+import ActionSheet from "react-native-actionsheet";
 
 import * as sessionActions from "../reducers/session/actions";
 import * as calendarActions from "../reducers/calendar/actions";
@@ -140,6 +140,8 @@ class CalendarScreen extends React.Component<CalendarScreenProps, CalendarScreen
       }
     ]
   };
+
+  ActionSheet: any;
 
   constructor(props: CalendarScreenProps) {
     super(props);
@@ -298,25 +300,34 @@ class CalendarScreen extends React.Component<CalendarScreenProps, CalendarScreen
     );
   }
 
+  renderActionSheet() {
+    const onPress = (buttonIndex: number) => {
+      if (ACTION_SHEET_BUTTONS[LOGOUT_INDEX] === ACTION_SHEET_BUTTONS[buttonIndex]) {
+        this.props.logOut();
+      }};
+
+    return (
+      <ActionSheet
+        ref={(o: any) => this.ActionSheet = o}
+        options={ACTION_SHEET_BUTTONS}
+        cancelButtonIndex={CANCEL_INDEX}
+        destructiveButtonIndex={LOGOUT_INDEX}
+        onPress={onPress}
+      />
+    );
+  }
+
   render() {
     return (
         <View style={styles.container}>
           {this.renderCalendar()}
+          { this.renderActionSheet() }
         </View>
     );
   }
 
   showActionSheet() {
-    ActionSheetIOS.showActionSheetWithOptions({
-        options: ACTION_SHEET_BUTTONS,
-        cancelButtonIndex: CANCEL_INDEX,
-        destructiveButtonIndex: LOGOUT_INDEX,
-      },
-      (buttonIndex: number) => {
-        if (ACTION_SHEET_BUTTONS[LOGOUT_INDEX] === ACTION_SHEET_BUTTONS[buttonIndex]) {
-          this.props.logOut();
-        }
-    });
+    this.ActionSheet.show();
   }
 }
 
