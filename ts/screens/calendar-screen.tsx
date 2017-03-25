@@ -335,14 +335,14 @@ class CalendarScreen extends React.Component<CalendarScreenProps, CalendarScreen
 function mapStateToProps(state: any) {
   return {
     isAuthenticated: state.session.isAuthenticated,
-    calendar: state.calendar.calendar,
-    logOut: sessionActions.logOut
+    calendar: state.calendar.calendar
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<any>) {
   return bindActionCreators({
-    fetchCalendar: calendarActions.fetchCalendar
+    fetchCalendar: calendarActions.fetchCalendar,
+    logOut: sessionActions.logOut
   }, dispatch) as any;
 }
 

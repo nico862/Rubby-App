@@ -26,7 +26,7 @@ class App {
   onStoreUpdate() {
     const newRootLayout =
       store.getState().session.requireUpgrade ? "upgrade" :
-        store.getState().session.isAuthenticated ? "main" : "login";
+      store.getState().session.isAuthenticated ? "main" : "login";
 
     if (this.currentRootLayout !== newRootLayout) {
       this.currentRootLayout = newRootLayout;
